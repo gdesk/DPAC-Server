@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: it.unibo.alice.tuprolog:tuprolog:3.2.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/it.unibo.alice.tuprolog/tuprolog/3.2.1/81cbe88770ef7be2ded8af565f4932e1dffe0a3a/tuprolog-3.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/it.unibo.alice.tuprolog/tuprolog/3.2.1/2d6a1d70af5cb16702e2202c521e93395a20c80a/tuprolog-3.2.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
