@@ -1,5 +1,6 @@
+import actors.GameMasterActor.GameEndMessage
 import actors.UserMasterActor.LoginMessage
-import actors.{MessageDispatcherActor, MessageReceiverActor, UserMasterActor}
+import actors.{GameMasterActor, MessageDispatcherActor, MessageReceiverActor, UserMasterActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
 
 /**
@@ -18,8 +19,15 @@ object Main {
     val messageReceiver: ActorRef = system actorOf(Props[MessageReceiverActor] , "messageReceiver")
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor], "messageDispatcher")
     val userMaster: ActorRef = system actorOf(Props[UserMasterActor], "userMaster")
+    val gameMaster: ActorRef = system actorOf(Props[GameMasterActor], "gameMaster")
 
 
     userMaster ! LoginMessage ("testUser", "pswd")
+
+    gameMaster ! GameEndMessage(42)
+
+
+    //todo nel companion object ci vanno i messaggi che può ricevere, fare un'altra interfaccia per quelli che invia
+
   }
 }
