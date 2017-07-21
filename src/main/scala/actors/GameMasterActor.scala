@@ -20,8 +20,8 @@ class GameMasterActor extends Actor {
 
     characterManager = context.actorOf(Props[CharacterManagerActor], "characterManager")
     playgroundManager = context.actorOf(Props[PlaygroundManagerActor], "playgroundManager")
-    friendManager = context.actorOf(Props[FriendManagerActor], "friendManager")
-    gameManager = context.actorOf(Props[GameManagerActor], "gameManager")
+    friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
+    gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameManager")
     endGameManager = context.actorOf(Props[GameEndManagerActor], "GameEndManager")
 
   }

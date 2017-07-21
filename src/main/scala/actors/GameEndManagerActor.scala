@@ -34,7 +34,9 @@ class GameEndManagerActor extends Actor {
 }
 
 object GameEndManagerActor {
-
+  ////////////////////////////////////////////////////////////////////////////
+  // TODO: i messaggi che ricevo ci vanno qui -> quando li mando li importo
+  //////////////////////////////////////////////////////////////////////////
   //case class GameEndMessage (result: Int)
   // todo: messaggi di risposta
 

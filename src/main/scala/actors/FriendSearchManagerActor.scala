@@ -7,7 +7,7 @@ import akka.actor.Actor
   *
   *  @author manuBottax
   */
-class FriendManagerActor extends Actor {
+class FriendSearchManagerActor extends Actor {
 
 
   override def preStart(): Unit = {
@@ -25,7 +25,7 @@ class FriendManagerActor extends Actor {
 
 }
 
-object FriendManagerActor {
+object FriendSearchManagerActor {
 
   // todo: messaggi di risposta
 

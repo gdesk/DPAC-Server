@@ -7,7 +7,7 @@ import akka.actor.Actor
   *
   *  @author manuBottax
   */
-class GameManagerActor extends Actor {
+class GameConfigurationManagerActor extends Actor {
 
 
   override def preStart(): Unit = {
@@ -25,7 +25,7 @@ class GameManagerActor extends Actor {
 
 }
 
-object GameManagerActor {
+object GameConfigurationManagerActor {
 
   // todo: messaggi di risposta
 
