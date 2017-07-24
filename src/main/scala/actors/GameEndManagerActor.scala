@@ -1,6 +1,5 @@
 package actors
 
-import actors.GameMasterActor.GameEndMessage
 import akka.actor.Actor
 
 /** Actor that manage the result of a match and save it.
@@ -20,10 +19,10 @@ class GameEndManagerActor extends Actor {
 
   def receive = {
 
-    case GameEndMessage (result) => {
-      println(s"Player has scored $result points")
-      saveResultInDB(result)
-    }
+    //case GameEndMessage (result) => {
+      //println(s"Player has scored $result points")
+      //saveResultInDB(result)
+    //}
 
     case _  => println ("received unknown message")
   }

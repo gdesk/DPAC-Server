@@ -1,31 +1,41 @@
 package actors
 
-import actors.LoginManagerActor.{LoginError, SuccessfulLogin}
-import actors.UserMasterActor.LoginMessage
-import akka.actor.Actor
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import model.User
+
+import scala.util.parsing.json.JSONObject
 
 /** Actor that manage the login of a user to the system.
   *
   * @author manuBottax
   */
-class LoginManagerActor extends Actor {
+class LoginManagerActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor {
 
+  override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-  override def preStart(): Unit = {
+    case "login" => {
+      println("An User want to login !")
+      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
+      val password: String = message.asInstanceOf[JSONObject].obj("password").toString
 
-    //todo: init()
-
-  }
-
-  def receive = {
-
-    case LoginMessage (username, hashedPassword)=> {
-      if ( checkUsername(username) && checkPassword(hashedPassword)){
+      if ( checkUsername(username) && checkPassword(password)){
+        val user: User = getUserfromDB(username)
+        addOnlineUser(user)
         println(s"The user $username successfully log in !")
-        sender() ! SuccessfulLogin
+        sender() ! JSONObject( Map[String, String](
+                   "object" -> "loginResult",
+                   "result" -> "success",
+                   "username" -> username,
+                   "senderIp" -> "127.0.0.1" )) //todo: l'ip andrà letto dal json in arrivo
       }
-      else
-        sender() ! LoginError
+      else {
+        println(s"Login for user $username has failed")
+        sender() ! JSONObject(Map[String, String](
+                   "object" -> "loginResult",
+                   "result" -> "fail",
+                   "username" -> username,
+                   "senderIp" -> "127.0.0.1")) //todo: l'ip andrà letto dal json in arrivo
+      }
     }
 
     case _  => println ("received unknown message")
@@ -37,12 +47,22 @@ class LoginManagerActor extends Actor {
   //todo
   private def checkPassword(password: String): Boolean = true
 
+  //todo
+  private def getUserfromDB(usernaem: String): User = null
+
+  //todo
+  private def addOnlineUser(user:User): Unit = {}
+
 }
 
 object LoginManagerActor {
 
-  case object SuccessfulLogin
-  case object LoginError
-
+    /**
+      * Create Props for an actor of this type.
+      *
+      * @param clientMessageDispatcher the reference to the actor that send message to the client
+      * @return a Props for creating this actor.
+      */
+    def props(clientMessageDispatcher: ActorRef): Props = Props(new LoginManagerActor(clientMessageDispatcher))
 }
 

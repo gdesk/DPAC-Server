@@ -1,5 +1,6 @@
-package actors
+package model
 
+import alice.util.IPAddress
 
 /** A single client reference.
   * Used to keep information about the client that is connected to the server.
@@ -17,3 +18,5 @@ trait Client {
   def ipAddress: String
 
 }
+
+class ClientImpl (override val id: String, override val ipAddress: String) extends Client

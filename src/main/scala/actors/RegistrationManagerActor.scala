@@ -1,36 +1,49 @@
 package actors
 
-import actors.RegistrationManagerActor.SuccessfulRegistration
-import actors.UserMasterActor.RegistrationMessage
-import akka.actor.{Actor, ActorRef, Props}
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import model.{ImmutableUser, User}
+import scala.util.parsing.json.JSONObject
 
 /** Actor that manage the registration of a new user user.
   * @author manuBottax
   */
-class RegistrationManagerActor extends Actor {
+class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor {
 
+  override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-  override def preStart(): Unit = {
+    case "newUser" => {
 
-    //todo: init()
+      println("A new user want to register !")
+      val name: String = message.asInstanceOf[JSONObject].obj("name").toString
+      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
+      val email: String = message.asInstanceOf[JSONObject].obj("email").toString
+      val password: String = message.asInstanceOf[JSONObject].obj("password").toString
 
-  }
-
-  def receive = {
-
-    case RegistrationMessage (username, hashedPassword)=> {
-      if ( checkUsername(username) ){
-        //todo
-        //addUserToDB(new UserImpl(username,hashedPassword)
+      if (checkUsername(username)) {
+        val newUser = new ImmutableUser(name, username, password, email)
+        addUserToDB(newUser)
+        println("Registration is completed successfully")
+        clientMessageDispatcher ! JSONObject( Map[String, String](
+                                  "object" -> "registrationResult",
+                                  "result" -> "success",
+                                  "senderIp" -> "127.0.0.1" )) //todo: l'ip andrà letto dal json in arrivo
       }
-      println(s"The user $username has been registered !")
-      sender() ! SuccessfulRegistration
+
+      else {
+        println("Error during registration")
+        clientMessageDispatcher ! JSONObject(Map[String, String](
+                                  "object" -> "registrationResult",
+                                  "result" -> "fail",
+                                  "senderIp" -> "127.0.0.1" )) //todo: l'ip andrà letto dal json in arrivo
+      }
     }
+
+      //todo: solo lo username deve essere univoco e controllato ?
 
     case _  => println ("received unknown message")
   }
 
-  //todo
+  //todo -> come per messaggio di login, gira messaggio al database manager e aspetta la risposta (???)
   private def checkUsername(username: String): Boolean = true
 
   //todo
@@ -40,6 +53,11 @@ class RegistrationManagerActor extends Actor {
 
 object RegistrationManagerActor {
 
-  case object SuccessfulRegistration
-
+    /**
+      * Create Props for an actor of this type.
+      *
+      * @param clientMessageDispatcher the reference to the actor that send message to the client
+      * @return a Props for creating this actor.
+      */
+    def props(clientMessageDispatcher: ActorRef): Props = Props(new RegistrationManagerActor(clientMessageDispatcher))
 }

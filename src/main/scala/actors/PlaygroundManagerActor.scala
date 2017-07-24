@@ -1,6 +1,5 @@
 package actors
 
-import actors.GameMasterActor.PlaygroundMessage
 import akka.actor.Actor
 
 /** Actor that manage the choice of a playground for the match.
@@ -18,7 +17,7 @@ class PlaygroundManagerActor extends Actor {
 
   def receive = {
 
-    case PlaygroundMessage => println(s"new Playground message !")
+    //case PlaygroundMessage => println(s"new Playground message !")
 
     case _  => println ("received unknown message")
   }

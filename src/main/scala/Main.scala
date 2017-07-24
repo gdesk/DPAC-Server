@@ -1,7 +1,11 @@
-import actors.GameMasterActor.GameEndMessage
-import actors.UserMasterActor.LoginMessage
-import actors.{GameMasterActor, MessageDispatcherActor, MessageReceiverActor, UserMasterActor}
+import java.io.File
+
+
+import actors.{MessageDispatcherActor, MessageReceiverActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
+import com.typesafe.config.{Config, ConfigFactory}
+
+import scala.util.parsing.json.JSONObject
 
 /**
   * Created by Manuel Bottax on 15/07/2017.
@@ -10,24 +14,29 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val defaultPort: String = "8080"
+    val config = ConfigFactory.parseFile(new File("src/dpacServer.conf"))
+    val system = ActorSystem.create("DpacServer", config)
 
-    val port: String = if (args.length > 0) args(0).toString else defaultPort
-
-    val system = ActorSystem("DpacServer")
-
-    val messageReceiver: ActorRef = system actorOf(Props[MessageReceiverActor] , "messageReceiver")
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor], "messageDispatcher")
-    val userMaster: ActorRef = system actorOf(Props[UserMasterActor], "userMaster")
-    val gameMaster: ActorRef = system actorOf(Props[GameMasterActor], "gameMaster")
+    val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
 
 
-    userMaster ! LoginMessage ("testUser", "pswd")
+    //test manuale
+    messageReceiver ! JSONObject(Map[String, String](
+          "object" -> "newUser",
+          "name" -> "testUser",
+          "username" -> "myUserName",
+          "email" -> "me@mail.com",
+          "password" -> "pswd"
+        ))
 
-    gameMaster ! GameEndMessage(42)
+    messageReceiver ! JSONObject(Map[String, String](
+      "object" -> "login",
+      "username" -> "myUserName",
+      "password" -> "pswd"
+    ))
 
 
-    //todo nel companion object ci vanno i messaggi che può ricevere, fare un'altra interfaccia per quelli che invia
 
   }
 }

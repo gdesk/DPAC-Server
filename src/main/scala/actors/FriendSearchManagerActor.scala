@@ -1,6 +1,5 @@
 package actors
 
-import actors.GameMasterActor.FriendMessage
 import akka.actor.Actor
 
 /** Actor that manage the research of friends for a private match.
@@ -18,7 +17,7 @@ class FriendSearchManagerActor extends Actor {
 
   def receive = {
 
-    case FriendMessage => println(s"new Friend message !")
+    //case FriendMessage => println(s"new Friend message !")
 
     case _  => println ("received unknown message")
   }

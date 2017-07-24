@@ -1,5 +1,4 @@
-package actors
-
+package model
 
 /** A message to be sent to a client trough the net.
   * Used to keep information about the data to send to the client.

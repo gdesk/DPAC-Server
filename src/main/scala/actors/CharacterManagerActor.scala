@@ -1,6 +1,5 @@
 package actors
 
-import actors.GameMasterActor.{CharacterMessage, PlaygroundMessage}
 import akka.actor.Actor
 
 /** Actor that manage the choice of a character for the match.
@@ -18,7 +17,7 @@ class CharacterManagerActor extends Actor {
 
   def receive = {
 
-    case CharacterMessage => println(s"new Character message !")
+    //case CharacterMessage => println(s"new Character message !")
 
     case _  => println ("received unknown message")
   }

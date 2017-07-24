@@ -1,6 +1,5 @@
 package actors
 
-import actors.GameMasterActor.GameMessage
 import akka.actor.Actor
 
 /** Actor that manage the creation of a match.
@@ -18,7 +17,7 @@ class GameConfigurationManagerActor extends Actor {
 
   def receive = {
 
-    case GameMessage => println(s"new Game message !")
+    //case GameMessage => println(s"new Game message !")
 
     case _  => println ("received unknown message")
   }
