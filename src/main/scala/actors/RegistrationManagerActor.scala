@@ -19,6 +19,8 @@ class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends U
       val email: String = message.asInstanceOf[JSONObject].obj("email").toString
       val password: String = message.asInstanceOf[JSONObject].obj("password").toString
 
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+
       if (checkUsername(username)) {
         val newUser = new ImmutableUser(name, username, password, email)
         addUserToDB(newUser)
@@ -26,7 +28,7 @@ class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends U
         clientMessageDispatcher ! JSONObject( Map[String, String](
                                   "object" -> "registrationResult",
                                   "result" -> "success",
-                                  "senderIp" -> "127.0.0.1" )) //todo: l'ip andrà letto dal json in arrivo
+                                  "senderIp" -> ip )) //todo: l'ip andrà letto dal json in arrivo
       }
 
       else {
@@ -34,7 +36,7 @@ class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends U
         clientMessageDispatcher ! JSONObject(Map[String, String](
                                   "object" -> "registrationResult",
                                   "result" -> "fail",
-                                  "senderIp" -> "127.0.0.1" )) //todo: l'ip andrà letto dal json in arrivo
+                                  "senderIp" -> ip )) //todo: l'ip andrà letto dal json in arrivo
       }
     }
 

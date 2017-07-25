@@ -27,13 +27,36 @@ object Main {
           "name" -> "testUser",
           "username" -> "myUserName",
           "email" -> "me@mail.com",
-          "password" -> "pswd"
+          "password" -> "pswd",
+          "senderIP" -> "127.0.0.1"
         ))
 
     messageReceiver ! JSONObject(Map[String, String](
       "object" -> "login",
       "username" -> "myUserName",
-      "password" -> "pswd"
+      "password" -> "pswd",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, String](
+      "object" -> "login",
+      "username" -> "myUserName2",
+      "password" -> "pswd",
+      "senderIP" -> "127.0.0.2"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, String](
+      "object" -> "login",
+      "username" -> "myUserName3",
+      "password" -> "pswd",
+      "senderIP" -> "127.0.0.3"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, String](
+      "object" -> "login",
+      "username" -> "myUserName4",
+      "password" -> "pswd",
+      "senderIP" -> "127.0.0.4"
     ))
 
 

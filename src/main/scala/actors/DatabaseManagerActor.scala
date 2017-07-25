@@ -25,8 +25,13 @@ class DatabaseManagerActor(val clientMessageDispatcher: ActorRef) extends Untype
         clientMessageDispatcher ! JSONObject(Map[String, Any](
                                   "object" -> "previousMatchResult",
                                   "list" -> resultList,
-                                  "senderIp" -> message.asInstanceOf[JSONObject].obj("senderIp").toString  ))
+                                  "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString  ))
     }
+
+    case "allMatchResult" => self ! JSONObject(Map[String, Any](
+          "object" -> "getPreviousMatchResult",
+          "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
+          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
     case _ => println("received unknown message")
   }

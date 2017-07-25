@@ -23,14 +23,14 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
   override def preStart(): Unit = {
 
     databaseManager = context.actorOf(DatabaseManagerActor.props(clientMessageDispatcher))
-    loginManager = context.actorOf(LoginManagerActor.props(clientMessageDispatcher))
+    loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
     registrationManager = context.actorOf(RegistrationManagerActor.props(clientMessageDispatcher))
 
     characterManager = context.actorOf(Props[CharacterManagerActor], "characterManager")
     playgroundManager = context.actorOf(Props[PlaygroundManagerActor], "playgroundManager")
     friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
-    gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameManager")
-    endGameManager = context.actorOf(Props[GameEndManagerActor], "GameEndManager")
+    gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
+    endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
 
   }
 
@@ -40,39 +40,63 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
 
     case "login" => loginManager ! message
 
-    /*case x: LoginMessage => {
-      println("The user " + x.username + " want to login !")
-      loginManager ! x
-    }
+    case "rangesRequest" => gameManager ! message
 
-    case UserMessage => {
-      println("The user send a message !")
-      userManager ! UserMessage
-    }*/
+    case "characterToChooseRequest" => characterManager ! message
+
+    case "chooseCharacter" => characterManager ! message
+
+    case "playgrounds" => playgroundManager ! message
+
+    case "choosenPlayground" => playgroundManager ! message
+
+    case "matchResult" => endGameManager ! message
+
+    case "allMatchResult" => databaseManager ! message
 
     //TODO Gestire le risposte
 
-      ///// LOCAL MESSAGE HANDLER ////////////////
+    ///////// LOCAL MESSAGE HANDLER ////////////////
 
-    case "loginResult" =>{
+    case "loginResult" => {
       val res: String = message.asInstanceOf[JSONObject].obj("result").toString
 
       if (res == "success") {
+
+        clientMessageDispatcher ! JSONObject(Map[String, String](
+                                  "object" -> "newOnlinePlayer",
+                                  "IP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString        ))
+
         databaseManager ! JSONObject(Map[String, String](
-                      "object" -> "getPreviousMatchResult",
-                      "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
-                      "senderIp" -> message.asInstanceOf[JSONObject].obj("senderIp").toString))
+                          "object" -> "getPreviousMatchResult",
+                          "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
+                          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
       }
+
+        //TODO: e se si dovesse sincronizzare dai messaggi
       else {
-          clientMessageDispatcher ! JSONObject(Map[String, String](
-                                    "object" -> "loginError",
-                                    "senderIp" -> message.asInstanceOf[JSONObject].obj("senderIp").toString))
-        }
+        clientMessageDispatcher ! JSONObject(Map[String, String](
+          "object" -> "loginError",
+          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
+      }
     }
 
-    case _  => println ("received unknown message")
-  }
+    case "ranges" => clientMessageDispatcher ! message
 
+    case "characterToChoose" => clientMessageDispatcher ! message
+
+    case "availableCharacter" => clientMessageDispatcher ! message
+
+    case "notifySelection" => clientMessageDispatcher ! message
+
+    case "AvailablePlaygrounds" => clientMessageDispatcher ! message
+
+    case "playgroundChosen" => clientMessageDispatcher ! message
+
+    case "resultSaved" => clientMessageDispatcher ! message
+
+    case _ => println("received unknown message")
+  }
 
 }
 

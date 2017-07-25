@@ -1,32 +1,40 @@
 package actors
 
-import akka.actor.Actor
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 
-/** Actor that manage the creation of a match.
+import scala.util.parsing.json.JSONObject
+
+/** Actor that manage the people waitnig for a match and the initial configuration of the game.
   *
   *  @author manuBottax
   */
-class GameConfigurationManagerActor extends Actor {
+class GameConfigurationManagerActor extends UntypedAbstractActor {
+
+  var availableRange: List[Range] = _
 
 
-  override def preStart(): Unit = {
+  override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    //todo: init()
+    case "rangesRequest"  => {
 
-  }
+      println("Request for the available ranges ")
 
-  def receive = {
+      availableRange = getAvailableRanges
 
-    //case GameMessage => println(s"new Game message !")
+      val m = JSONObject(Map[String, Any](
+              "object" -> "ranges",
+              "list" -> availableRange ,
+              "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
+      sender() ! m
+
+    }
 
     case _  => println ("received unknown message")
   }
 
-}
-
-object GameConfigurationManagerActor {
-
-  // todo: messaggi di risposta
+  //todo: carica i range disponibili
+  private def getAvailableRanges: List[Range] = null
 
 }
 
