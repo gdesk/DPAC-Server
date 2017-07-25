@@ -1,7 +1,5 @@
 package model
 
-import alice.util.IPAddress
-
 /** A single client reference.
   * Used to keep information about the client that is connected to the server.
   *
