@@ -48,7 +48,7 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
 
     case "playgrounds" => playgroundManager ! message
 
-    case "choosenPlayground" => playgroundManager ! message
+    case "chosenPlayground" => playgroundManager ! message
 
     case "matchResult" => endGameManager ! message
 

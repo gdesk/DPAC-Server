@@ -12,6 +12,8 @@ import scala.util.parsing.json.JSONObject
 class MessageDispatcherActor extends UntypedAbstractActor {
 
   var onlineClient: Map[String, Client] = Map()
+  // todo: gestire la disconnessione
+  // todo: e se ha più client sulla stessa rete ? (stesso ip)
 
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {

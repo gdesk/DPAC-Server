@@ -33,7 +33,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
                 "senderIP" -> senderIP))
     }
 
-    case "choosenPlayground" => {
+    case "chosenPlayground" => {
       val vote: Int = message.asInstanceOf[JSONObject].obj("playground").asInstanceOf[Int]
       val playersNumber: Int = message.asInstanceOf[JSONObject].obj("playersNumber").asInstanceOf[Int]
 
