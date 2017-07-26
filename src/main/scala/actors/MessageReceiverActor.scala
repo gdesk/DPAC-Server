@@ -1,6 +1,7 @@
 package actors
 
 import akka.actor.{Actor, ActorRef, Props, UntypedAbstractActor}
+import model.MatchManager
 
 import scala.util.parsing.json.JSONObject
 
@@ -22,15 +23,16 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
 
   override def preStart(): Unit = {
 
-    databaseManager = context.actorOf(DatabaseManagerActor.props(clientMessageDispatcher))
+    databaseManager = context.actorOf(DatabaseManagerActor.props(clientMessageDispatcher) , "databaseManager")
     loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
-    registrationManager = context.actorOf(RegistrationManagerActor.props(clientMessageDispatcher))
+    registrationManager = context.actorOf(RegistrationManagerActor.props(clientMessageDispatcher) , "registrationManager")
 
     characterManager = context.actorOf(Props[CharacterManagerActor], "characterManager")
     playgroundManager = context.actorOf(Props[PlaygroundManagerActor], "playgroundManager")
     friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
-    gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
+    gameManager = context.actorOf(GameConfigurationManagerActor.props(new MatchManager), "gameConfigurationManager")
     endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
+
 
   }
 
@@ -41,6 +43,10 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
     case "login" => loginManager ! message
 
     case "rangesRequest" => gameManager ! message
+
+    case "selectedRange" => gameManager ! message
+
+    case "startGame" => gameManager ! message
 
     case "characterToChooseRequest" => characterManager ! message
 
@@ -65,7 +71,8 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
 
         clientMessageDispatcher ! JSONObject(Map[String, String](
                                   "object" -> "newOnlinePlayer",
-                                  "IP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString        ))
+                                  "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
+                                  "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString        ))
 
         databaseManager ! JSONObject(Map[String, String](
                           "object" -> "getPreviousMatchResult",
@@ -92,6 +99,8 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
     case "AvailablePlaygrounds" => clientMessageDispatcher ! message
 
     case "playgroundChosen" => clientMessageDispatcher ! message
+
+    case "otherPlayerIP" => clientMessageDispatcher ! message
 
     case "resultSaved" => clientMessageDispatcher ! message
 
