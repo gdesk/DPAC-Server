@@ -1,9 +1,8 @@
 import java.io.File
 
-
 import actors.{MessageDispatcherActor, MessageReceiverActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 
 import scala.util.parsing.json.JSONObject
 
@@ -17,7 +16,7 @@ object Main {
     val config = ConfigFactory.parseFile(new File("src/dpacServer.conf"))
     val system = ActorSystem.create("DpacServer", config)
 
-    val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor], "messageDispatcher")
+    val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor] , "messageDispatcher")
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
 
 
