@@ -24,13 +24,23 @@ trait ClientManager {
 
 object ClientManager {
 
-   var onlineClient: Map[String, Client] = Map()
+   //var onlineClient: Map[String, Client] = Map()
+   var onlineClient: Set[Client] = Set()
 
-   def addPlayer(client: Client): Unit = onlineClient = onlineClient + (client.ipAddress -> client)
+   def addPlayer(client: Client): Unit = onlineClient = onlineClient + client
 
-   def removePlayer(client: Client): Unit = onlineClient = onlineClient - client.ipAddress
+   def removePlayer(client: Client): Unit = onlineClient = onlineClient - client
 
-   def getClient(ipAddress: String): Option[Client] = onlineClient.get(ipAddress)
+   def getClient(ipAddress: String): Option[Client] = {
+      for (x <- onlineClient) {
+         if ( x.ipAddress == ipAddress)
+            return Option(x)
+      }
+
+      Option.empty[Client]
+   }
+
+   // def getClient(ipAddress: String): Option[Client] = onlineClient.get(ipAddress)
 
    def onlinePlayerCount: Int = onlineClient.size
 }

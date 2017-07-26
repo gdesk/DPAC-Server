@@ -9,7 +9,7 @@ import scala.util.parsing.json.JSONObject
   *
   *  @author manuBottax
   */
-class GameConfigurationManagerActor (val matchManager: MatchManager) extends UntypedAbstractActor {
+class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   var availableRange: List[Range] = _
 
@@ -35,7 +35,7 @@ class GameConfigurationManagerActor (val matchManager: MatchManager) extends Unt
 
       println("range selected: " + range.toString())
 
-      val selectedMatch: Option[Match] = matchManager.getWaitingMatchFor(range).headOption
+      val selectedMatch: Option[Match] = MatchManager.getWaitingMatchFor(range).headOption
 
       if (selectedMatch.isDefined){
         println("Assigned to a match")
@@ -51,7 +51,7 @@ class GameConfigurationManagerActor (val matchManager: MatchManager) extends Unt
     case "startGame" => {
 
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val playerList: List[Client] = matchManager.getMatchFor(ClientManager.getClient(senderIP).get).involvedPlayer
+      val playerList: List[Client] = MatchManager.getMatchFor(ClientManager.getClient(senderIP).get).involvedPlayer
 
       var ipList: Set[String] = Set()
 
@@ -75,18 +75,6 @@ class GameConfigurationManagerActor (val matchManager: MatchManager) extends Unt
 
 
 
-}
-
-
-object GameConfigurationManagerActor {
-
-  /**
-    * Create Props for an actor of this type.
-    *
-    * @param matchManager reference to a common manager for the match.
-    * @return a Props for creating this actor.
-    */
-  def props(matchManager: MatchManager): Props = Props(new GameConfigurationManagerActor(matchManager))
 }
 
 

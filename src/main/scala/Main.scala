@@ -41,21 +41,21 @@ object Main {
       "object" -> "login",
       "username" -> "myUserName2",
       "password" -> "pswd",
-      "senderIP" -> "127.0.0.2"
+      "senderIP" -> "127.0.0.1"
     ))
 
     messageReceiver ! JSONObject(Map[String, String](
       "object" -> "login",
       "username" -> "myUserName3",
       "password" -> "pswd",
-      "senderIP" -> "127.0.0.3"
+      "senderIP" -> "127.0.0.1"
     ))
 
     messageReceiver ! JSONObject(Map[String, String](
       "object" -> "login",
       "username" -> "myUserName4",
       "password" -> "pswd",
-      "senderIP" -> "127.0.0.4"
+      "senderIP" -> "127.0.0.1"
     ))
 
 

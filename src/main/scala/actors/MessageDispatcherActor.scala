@@ -126,6 +126,18 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     case "resultSaved" => forwardMessage(message.asInstanceOf[JSONObject])
 
+      ///// client bootstrap ///////////////////
+    case "clientCanConnect" => {
+      val reply: JSONObject = JSONObject(Map[String, Any](
+        //result" -> PeerBootstrapMessages.CLIENT_CAN_START_RUNNING,
+        "result" -> "ClientCanStartRunning" ))
+
+      for (x <- ClientManager.onlineClient) {
+        sendConfigurationMessage(x, reply)
+        //sendConfigurationMessage(x._2, reply)
+      }
+    }
+
     //////////////// LOCAL BEHAVIOUR MESSAGE /////////////////////////
 
     case "newOnlinePlayer" => {
@@ -151,7 +163,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   private def sendConfigurationMessage(to: Client, message: Any): Unit = {
 
     //todo come siamo rimasti per le porte ? -> come faccio a trovare il tuo Thread per mandargli i messaggi ?
-    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + to.ipAddress + ":4552" + "/ClientWorkerThread")
+    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + to.ipAddress + ":4552" + "/ClientWorkerThread")
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + to.ipAddress + ":4552" + "/user/" + "fakeReceiver")
     receiver ! message
   }
 
@@ -166,18 +179,22 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     }
   }
 
+  //todo: questo va fatto solo per la partita interessata
   private def broadcastMessage(message: JSONObject): Unit = {
 
     for (x <- ClientManager.onlineClient) {
-      sendRemoteMessage(x._2, message)
+      sendConfigurationMessage(x, message)
+      //sendRemoteMessage(x._2, message)
     }
   }
 
   private def notifyOtherClient(excludedClient: String, message: Any): Unit = {
 
     for (x <- ClientManager.onlineClient) {
-      if (x._1 != excludedClient)
-        sendRemoteMessage(x._2, message)
+      if (x.ipAddress != excludedClient)
+        sendRemoteMessage(x, message)
+      /*if (x._1 != excludedClient)
+        sendRemoteMessage(x._2, message)*/
     }
   }
 

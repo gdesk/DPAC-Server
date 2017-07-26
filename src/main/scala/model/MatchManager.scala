@@ -3,7 +3,7 @@ package model
 /**
   * Created by Manuel Bottax on 26/07/2017.
   */
-class MatchManager {
+object MatchManager {
 
   private var waitingMatch: List[Match] = List()
   private var startedMatch: List[Match] = List()
@@ -18,6 +18,10 @@ class MatchManager {
       }
     }
     null
+  }
+
+  def getWaitingMatch: List[Match] = {
+    waitingMatch
   }
 
   def startMatch( selected: Match): Unit = {

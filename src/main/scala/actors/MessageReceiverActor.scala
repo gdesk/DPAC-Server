@@ -21,6 +21,8 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
   var gameManager: ActorRef = _
   var endGameManager: ActorRef = _
 
+  var peerBootstrapManager:ActorRef = _
+
   override def preStart(): Unit = {
 
     databaseManager = context.actorOf(DatabaseManagerActor.props(clientMessageDispatcher) , "databaseManager")
@@ -30,8 +32,10 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
     characterManager = context.actorOf(Props[CharacterManagerActor], "characterManager")
     playgroundManager = context.actorOf(Props[PlaygroundManagerActor], "playgroundManager")
     friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
-    gameManager = context.actorOf(GameConfigurationManagerActor.props(new MatchManager), "gameConfigurationManager")
+    gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
     endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
+
+    peerBootstrapManager = context.actorOf(Props[peerBootstrapManagerActor], "PeerBootstrapdManager")
 
 
   }
@@ -59,6 +63,9 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
     case "matchResult" => endGameManager ! message
 
     case "allMatchResult" => databaseManager ! message
+
+      //todo: Se fosse una stringa sarebbe meglio
+    case "serverIsRunning" => peerBootstrapManager ! message
 
     //TODO Gestire le risposte
 
@@ -103,6 +110,8 @@ class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends Untyp
     case "otherPlayerIP" => clientMessageDispatcher ! message
 
     case "resultSaved" => clientMessageDispatcher ! message
+
+    case "clientCanConnect" => clientMessageDispatcher ! message
 
     case _ => println("received unknown message")
   }
