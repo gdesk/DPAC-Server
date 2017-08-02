@@ -9,111 +9,48 @@ import scala.util.parsing.json.JSONObject
   *
   * @author manuBottax
   */
-class MessageReceiverActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor {
+class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbstractActor {
 
-  var databaseManager: ActorRef = _
-  var loginManager: ActorRef = _
-  var registrationManager: ActorRef = _
-
-  var characterManager: ActorRef = _
-  var playgroundManager: ActorRef = _
-  var friendManager: ActorRef = _
-  var gameManager: ActorRef = _
-  var endGameManager: ActorRef = _
-
-  var peerBootstrapManager:ActorRef = _
+  var userMaster: ActorRef = _
+  var matchMaster: ActorRef = _
 
   override def preStart(): Unit = {
 
-    databaseManager = context.actorOf(DatabaseManagerActor.props(clientMessageDispatcher) , "databaseManager")
-    loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
-    registrationManager = context.actorOf(RegistrationManagerActor.props(clientMessageDispatcher) , "registrationManager")
-
-    characterManager = context.actorOf(Props[CharacterManagerActor], "characterManager")
-    playgroundManager = context.actorOf(Props[PlaygroundManagerActor], "playgroundManager")
-    friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
-    gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
-    endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
-
-    peerBootstrapManager = context.actorOf(Props[peerBootstrapManagerActor], "PeerBootstrapdManager")
-
-
+    userMaster = context.actorOf(UserMasterActor.props(messageDispatcher) , "userMaster")
+    matchMaster = context.actorOf(MatchMasterActor.props(messageDispatcher) , "matchMaster")
+    super.preStart()
   }
+
+
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    case "newUser" => registrationManager ! message
+    case "newUser" => userMaster ! message
 
-    case "login" => loginManager ! message
+    case "login" => userMaster ! message
 
-    case "rangesRequest" => gameManager ! message
+    case "allMatchResult" => userMaster ! message
 
-    case "selectedRange" => gameManager ! message
+    case "rangesRequest" => matchMaster ! message
 
-    case "startGame" => gameManager ! message
+    case "selectedRange" => matchMaster ! message
 
-    case "characterToChooseRequest" => characterManager ! message
+    case "startGame" => matchMaster ! message
 
-    case "chooseCharacter" => characterManager ! message
+    case "characterToChooseRequest" => matchMaster ! message
 
-    case "playgrounds" => playgroundManager ! message
+    case "chooseCharacter" => matchMaster ! message
 
-    case "chosenPlayground" => playgroundManager ! message
+    case "playgrounds" => matchMaster ! message
 
-    case "matchResult" => endGameManager ! message
+    case "chosenPlayground" => matchMaster ! message
 
-    case "allMatchResult" => databaseManager ! message
+    case "matchResult" => matchMaster ! message
 
       //todo: Se fosse una stringa sarebbe meglio
-    case "serverIsRunning" => peerBootstrapManager ! message
+    case "serverIsRunning" => matchMaster ! message
 
-    //TODO Gestire le risposte
-
-    ///////// LOCAL MESSAGE HANDLER ////////////////
-
-    case "loginResult" => {
-      val res: String = message.asInstanceOf[JSONObject].obj("result").toString
-
-      if (res == "success") {
-
-        clientMessageDispatcher ! JSONObject(Map[String, String](
-                                  "object" -> "newOnlinePlayer",
-                                  "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
-                                  "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString        ))
-
-        databaseManager ! JSONObject(Map[String, String](
-                          "object" -> "getPreviousMatchResult",
-                          "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
-                          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
-      }
-
-        //TODO: e se si dovesse sincronizzare dai messaggi
-      else {
-        clientMessageDispatcher ! JSONObject(Map[String, String](
-          "object" -> "loginError",
-          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
-      }
-    }
-
-    case "ranges" => clientMessageDispatcher ! message
-
-    case "characterToChoose" => clientMessageDispatcher ! message
-
-    case "availableCharacter" => clientMessageDispatcher ! message
-
-    case "notifySelection" => clientMessageDispatcher ! message
-
-    case "AvailablePlaygrounds" => clientMessageDispatcher ! message
-
-    case "playgroundChosen" => clientMessageDispatcher ! message
-
-    case "otherPlayerIP" => clientMessageDispatcher ! message
-
-    case "resultSaved" => clientMessageDispatcher ! message
-
-    case "clientCanConnect" => clientMessageDispatcher ! message
-
-    case _ => println("received unknown message")
+    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
 }
@@ -127,4 +64,5 @@ object MessageReceiverActor {
     * @return a Props for creating this actor.
     */
   def props(clientMessageDispatcher: ActorRef): Props = Props(new MessageReceiverActor(clientMessageDispatcher))
+
 }

@@ -49,7 +49,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
       }
     }
 
-    case _  => println ("received unknown message")
+    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
   //todo

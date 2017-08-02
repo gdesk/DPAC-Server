@@ -20,6 +20,8 @@ object Main {
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
 
 
+
+
     //test manuale
     messageReceiver ! JSONObject(Map[String, String](
           "object" -> "newUser",

@@ -60,6 +60,8 @@ class CharacterManagerActor extends UntypedAbstractActor {
     }
 
     case "choosenCharacter" => println("ti devo inviare il pacchetto completo del personaggio")
+
+    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
   //todo

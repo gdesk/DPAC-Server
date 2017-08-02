@@ -67,7 +67,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
         "senderIP" -> senderIP ))
     }
 
-    case _ => println("received unknown message")
+    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
   //todo: carica i range disponibili

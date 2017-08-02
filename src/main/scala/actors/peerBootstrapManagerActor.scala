@@ -44,6 +44,8 @@ class peerBootstrapManagerActor extends UntypedAbstractActor{
 
     }
 
+    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
+
   }
 
   private def faiQualcosaCheContaSeCiSonoTutti: Boolean  = true

@@ -7,7 +7,7 @@ import scala.util.parsing.json.JSONObject
 /** Actor that manage the registration of a new user user.
   * @author manuBottax
   */
-class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor {
+class RegistrationManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
@@ -25,7 +25,7 @@ class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends U
         val newUser = new ImmutableUser(name, username, password, email)
         addUserToDB(newUser)
         println("Registration is completed successfully")
-        clientMessageDispatcher ! JSONObject( Map[String, String](
+        sender() ! JSONObject( Map[String, String](
                                   "object" -> "registrationResult",
                                   "result" -> "success",
                                   "senderIp" -> ip )) //todo: l'ip andrà letto dal json in arrivo
@@ -33,7 +33,7 @@ class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends U
 
       else {
         println("Error during registration")
-        clientMessageDispatcher ! JSONObject(Map[String, String](
+        sender() ! JSONObject(Map[String, String](
                                   "object" -> "registrationResult",
                                   "result" -> "fail",
                                   "senderIp" -> ip )) //todo: l'ip andrà letto dal json in arrivo
@@ -42,7 +42,7 @@ class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends U
 
       //todo: solo lo username deve essere univoco e controllato ?
 
-    case _  => println ("received unknown message")
+    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
   //todo -> come per messaggio di login, gira messaggio al database manager e aspetta la risposta (???)
@@ -51,15 +51,4 @@ class RegistrationManagerActor (val clientMessageDispatcher: ActorRef) extends U
   //todo
   private def addUserToDB(user: User): Unit = {}
 
-}
-
-object RegistrationManagerActor {
-
-    /**
-      * Create Props for an actor of this type.
-      *
-      * @param clientMessageDispatcher the reference to the actor that send message to the client
-      * @return a Props for creating this actor.
-      */
-    def props(clientMessageDispatcher: ActorRef): Props = Props(new RegistrationManagerActor(clientMessageDispatcher))
 }

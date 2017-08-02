@@ -22,11 +22,22 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       val receiver: Option[Client] = ClientManager.getClient(ip)
       println("registration has " + res)
 
+      var reply: JSONObject = JSONObject(Map[String, Any](
+                              "object" -> "registrationResult",
+                              "result" -> false ))
+      if (res == "success"){
+        reply = JSONObject(Map[String, Any](
+          "object" -> "registrationResult",
+          "result" -> true ))
+      }
+      else {
+        reply = JSONObject(Map[String, Any](
+          "object" -> "registrationResult",
+          "result" -> false ))
+      }
+
       if (receiver.isDefined) {
-        if (res == "success")
-          sendRemoteMessage(receiver.get, true)
-        else
-          sendRemoteMessage(receiver.get, false)
+          sendRemoteMessage(receiver.get, reply)
       }
 
     }
@@ -149,7 +160,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       println(s"Player $username connected from $ip ! Now online " + ClientManager.onlinePlayerCount + " players")
     }
 
-    case _ => println("Unknown message")
+    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
   private def sendRemoteMessage(to: Client, message: Any): Unit = {
@@ -160,6 +171,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     receiver ! message
   }
 
+  //todo: invio il messaggio ad uno degli attori che è quello della fede (basta beccarlo con la selection).
   private def sendConfigurationMessage(to: Client, message: Any): Unit = {
 
     //todo come siamo rimasti per le porte ? -> come faccio a trovare il tuo Thread per mandargli i messaggi ?
