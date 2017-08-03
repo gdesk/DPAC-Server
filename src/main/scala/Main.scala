@@ -19,7 +19,7 @@ object Main {
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor] , "messageDispatcher")
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
 
-
+    /*
 
 
     //test manuale
@@ -60,6 +60,7 @@ object Main {
       "senderIP" -> "127.0.0.1"
     ))
 
+    */
 
 
   }

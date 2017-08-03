@@ -164,10 +164,12 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   }
 
   private def sendRemoteMessage(to: Client, message: Any): Unit = {
-    val clientActorName = "fakeReceiver"
+    //val clientActorName = "fakeReceiver"
+    val clientActorName = "messageReceiver"
     //val receiver: ActorSelection = context.actorSelection("akka.tcp://ClientSystem@" + to.ipAddress + "/user/" + clientActorName)
     //todo come siamo rimasti per le porte ? -> conviene mandare nel messaggio (Ip + porta)
-    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + to.ipAddress + ":4552" + "/user/" + clientActorName)
+    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + to.ipAddress + ":4552" + "/user/" + clientActorName)
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + to.ipAddress + ":2554" + "/user/" + clientActorName)
     receiver ! message
   }
 
