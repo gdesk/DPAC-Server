@@ -35,6 +35,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
     case "selectedRange" => matchMaster ! message
 
+    /// PeerBootstrap
     case "startGame" => matchMaster ! message
 
     case "characterToChooseRequest" => matchMaster ! message
@@ -49,6 +50,10 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
       //todo: Se fosse una stringa sarebbe meglio
     case "serverIsRunning" => matchMaster ! message
+
+
+
+    //case "startGame" => matchMaster ! message
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }

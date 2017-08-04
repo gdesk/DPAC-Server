@@ -9,7 +9,7 @@ import scala.util.parsing.json.JSONObject
   *
   * @author manuBottax
   */
-class DatabaseManagerActor extends UntypedAbstractActor {
+class PlayerManagerActor extends UntypedAbstractActor {
 
   //todo: questo attore interagisce con il db e mi restituisce informazioni sugli utenti => probabilmente servirà un parametro
 

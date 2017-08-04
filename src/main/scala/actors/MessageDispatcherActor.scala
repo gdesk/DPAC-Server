@@ -18,8 +18,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
       val res: String = message.asInstanceOf[JSONObject].obj("result").toString
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
-
-      val receiver: Option[Client] = ClientManager.getClient(ip)
+      
       println("registration has " + res)
 
       var reply: JSONObject = JSONObject(Map[String, Any](

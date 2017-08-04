@@ -9,7 +9,8 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
   var friendManager: ActorRef = _
   var gameManager: ActorRef = _
   var endGameManager: ActorRef = _
-  var peerBootstrapManager: ActorRef = _
+
+  var clientManager: ActorRef = _
 
   override def preStart(): Unit = {
 
@@ -18,8 +19,8 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
     friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
     gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
     endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
-    peerBootstrapManager = context.actorOf(Props[peerBootstrapManagerActor], "PeerBootstrapdManager")
 
+    clientManager = context.actorOf(Props[ClientManagerActor], "clientManager")
   }
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
@@ -28,6 +29,7 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "selectedRange" => gameManager ! message
 
+    /// PeerBootstrap
     case "startGame" => gameManager ! message
 
     case "characterToChooseRequest" => characterManager ! message
@@ -40,8 +42,11 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "matchResult" => endGameManager ! message
 
-    //todo: Se fosse una stringa sarebbe meglio
-    case "serverIsRunning" => peerBootstrapManager ! message
+    ///// PeerBootstrap
+    case "serverIsRunning" => gameManager ! message
+
+
+    //case "startGame" => peerBootstrapManager ! message
 
     ////// LOCAL MESSAGE HANDLER ////////////////////
 
