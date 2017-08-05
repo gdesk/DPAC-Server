@@ -12,7 +12,7 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
   override def preStart(): Unit = {
 
-    databaseManager = context.actorOf(Props[PlayerManagerActor] , "databaseManager")
+    databaseManager = context.actorOf(Props[DatabaseManagerActor] , "databaseManager")
     loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
     registrationManager = context.actorOf(Props[RegistrationManagerActor] , "registrationManager")
 

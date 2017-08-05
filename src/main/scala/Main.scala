@@ -19,7 +19,7 @@ object Main {
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor] , "messageDispatcher")
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
 
-    /*
+
 
 
     //test manuale
@@ -31,6 +31,8 @@ object Main {
           "password" -> "pswd",
           "senderIP" -> "127.0.0.1"
         ))
+
+    /*
 
     messageReceiver ! JSONObject(Map[String, String](
       "object" -> "login",

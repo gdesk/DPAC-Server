@@ -1,8 +1,6 @@
 package actors
 
-import akka.actor.{Actor, ActorRef, Props, UntypedAbstractActor}
-
-import scala.util.parsing.json.JSONObject
+import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 
 /** Actor that receive message from the net, parse it and send appropriate message to the actor in the server.
   *
@@ -18,9 +16,8 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
     userMaster = context.actorOf(UserMasterActor.props(messageDispatcher) , "userMaster")
     matchMaster = context.actorOf(MatchMasterActor.props(messageDispatcher) , "matchMaster")
     super.preStart()
+
   }
-
-
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 

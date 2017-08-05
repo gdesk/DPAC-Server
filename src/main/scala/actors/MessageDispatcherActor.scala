@@ -16,27 +16,26 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     case "registrationResult" => {
 
-      val res: String = message.asInstanceOf[JSONObject].obj("result").toString
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val result: String = message.asInstanceOf[JSONObject].obj("result").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
-      println("registration has " + res)
+      println("registration has " + result)
 
-      var reply: JSONObject = JSONObject(Map[String, Any](
-                              "object" -> "registrationResult",
-                              "result" -> false ))
-      if (res == "success"){
-        reply = JSONObject(Map[String, Any](
+      if (result == "success"){
+        val reply = JSONObject(Map[String, Any](
           "object" -> "registrationResult",
           "result" -> true ))
+
+        sendRemoteMessage(ip, reply)
       }
+
       else {
-        reply = JSONObject(Map[String, Any](
+        val reply = JSONObject(Map[String, Any](
           "object" -> "registrationResult",
           "result" -> false ))
+
+        sendRemoteMessage(ip, reply)
       }
-
-      sendRemoteMessage(ip, reply)
-
     }
 
     case "loginError" => {
