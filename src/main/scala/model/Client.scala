@@ -1,20 +1,21 @@
 package model
 
-/** A single client reference.
-  * Used to keep information about the client that is connected to the server.
-  *
-  * @author manuBottax
+/**
+  * Created by Manuel Bottax on 05/08/2017.
   */
 trait Client {
 
-  /** the unique ID code for the client.
-    */
-  def id: String
+  def ip: String
 
-  /** the net address of the client.
-    */
-  def ipAddress: String
+  def username: String
 
 }
 
-class ClientImpl (override val id: String, override val ipAddress: String) extends Client
+class ClientImpl (val ip: String, val username: String) extends Client {
+
+  //TODO
+  def getUser: User ={
+    //DBManager.getUser(username)
+    null
+  }
+}
