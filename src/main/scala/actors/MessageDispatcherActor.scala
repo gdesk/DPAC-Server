@@ -53,7 +53,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     case "previousMatchResult" => {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
-      println("Login ok ! ")
+      println("Login ok ! Previous result loaded !")
 
       val reply: JSONObject = JSONObject(Map[String, Any](
         "object" -> "matches",
@@ -136,21 +136,6 @@ class MessageDispatcherActor extends UntypedAbstractActor {
         "result" -> "ClientCanStartRunning"))
 
       broadcastConfigurationMessage(reply)
-    }
-
-    //////////////// LOCAL BEHAVIOUR MESSAGE /////////////////////////
-
-    case "newOnlinePlayer" => {
-      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-
-      val client: Client = new ClientImpl(ip, username)
-
-      context.actorSelection("user/clientManager") ! JSONObject(Map[String, Any](
-                                  "object" -> "addOnlinePlayer",
-                                  "player" -> client ))
-
-      println(s"Player $username connected from $ip !" )
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))

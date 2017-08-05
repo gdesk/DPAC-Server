@@ -1,6 +1,7 @@
 package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import model.{Client, ClientImpl}
 
 import scala.util.parsing.json.JSONObject
 
@@ -9,12 +10,14 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
   var databaseManager: ActorRef = _
   var loginManager: ActorRef = _
   var registrationManager: ActorRef = _
+  var clientManager: ActorRef = _
 
   override def preStart(): Unit = {
 
     databaseManager = context.actorOf(Props[DatabaseManagerActor] , "databaseManager")
     loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
     registrationManager = context.actorOf(Props[RegistrationManagerActor] , "registrationManager")
+    clientManager = context.actorOf(Props[ClientManagerActor], "clientManager")
 
     super.preStart()
   }
@@ -32,26 +35,33 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
     case "registrationResult" => clientMessageDispatcher ! message
 
     case "loginResult" => {
-      val res: String = message.asInstanceOf[JSONObject].obj("result").toString
+      val result: String = message.asInstanceOf[JSONObject].obj("result").toString
+      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
-      if (res == "success") {
+      result match {
 
-        clientMessageDispatcher ! JSONObject(Map[String, String](
-          "object" -> "newOnlinePlayer",
-          "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
-          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString        ))
+        case "success" => {
 
-        databaseManager ! JSONObject(Map[String, String](
-          "object" -> "getPreviousMatchResult",
-          "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
-          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
-      }
+          val client: Client = new ClientImpl(ip, username)
 
-      //TODO: e se si dovesse sincronizzare dai messaggi
-      else {
-        clientMessageDispatcher ! JSONObject(Map[String, String](
-          "object" -> "loginError",
-          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
+          context.actorSelection("clientManager") ! JSONObject(Map[String, Any](
+                    "object" -> "addOnlinePlayer",
+                    "player" -> client ))
+
+          println(s"Player $username connected from $ip !" )
+
+          databaseManager ! JSONObject(Map[String, String](
+            "object" -> "getPreviousMatchResult",
+            "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
+            "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
+        }
+
+        case _ => {
+          clientMessageDispatcher ! JSONObject(Map[String, String](
+            "object" -> "loginError",
+            "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
+        }
       }
     }
 

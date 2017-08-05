@@ -32,7 +32,7 @@ object Main {
           "senderIP" -> "127.0.0.1"
         ))
 
-    /*
+
 
     messageReceiver ! JSONObject(Map[String, String](
       "object" -> "login",
@@ -62,7 +62,7 @@ object Main {
       "senderIP" -> "127.0.0.1"
     ))
 
-    */
+
 
 
   }

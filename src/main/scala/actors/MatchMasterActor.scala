@@ -19,8 +19,6 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
     friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
     gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
     endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
-
-    clientManager = context.actorOf(Props[ClientManagerActor], "clientManager")
   }
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
