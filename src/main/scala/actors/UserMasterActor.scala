@@ -51,6 +51,10 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
           println(s"Player $username connected from $ip !" )
 
+          clientMessageDispatcher ! JSONObject(Map[String, String](
+                                    "object" -> "onlineClient",
+                                    "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
+
           databaseManager ! JSONObject(Map[String, String](
             "object" -> "getPreviousMatchResult",
             "username" -> message.asInstanceOf[JSONObject].obj("username").toString,

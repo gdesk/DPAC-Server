@@ -23,11 +23,11 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    case "rangesRequest" => gameManager ! message
+    case "rangesRequest" => gameManager ! message //ok
 
-    case "selectedRange" => gameManager ! message
+    case "selectedRange" => gameManager ! message //ok
 
-    case "characterToChooseRequest" => characterManager ! message
+    case "characterToChooseRequest" => characterManager ! message //ok
 
     case "chooseCharacter" => characterManager ! message
 

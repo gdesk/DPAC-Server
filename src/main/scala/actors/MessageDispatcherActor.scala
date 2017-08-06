@@ -11,8 +11,14 @@ import scala.util.parsing.json.JSONObject
   */
 class MessageDispatcherActor extends UntypedAbstractActor {
 
+  var onlineClientIP: List[String] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
+
+    case "onlineClient" => {
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      onlineClientIP = onlineClientIP ::: List (ip)
+    }
 
     case "registrationResult" => {
 
@@ -94,6 +100,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     case "notifySelection" => {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
 
+
       notifyOtherClient(ip, message)
     }
 
@@ -165,26 +172,17 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   //todo: questo va fatto solo per la partita interessata
   private def broadcastMessage(message: JSONObject): Unit = {
 
-    //TODO OOOOOOOOOOOOOOOOOOOOOO
-
-    //for (x <- ClientManager.onlineClient) {
-      //sendConfigurationMessage(x, message)
-      //sendRemoteMessage(x._2, message)
-    //}
+    onlineClientIP.foreach((x) => sendRemoteMessage(x,message))
   }
 
-  private def broadcastConfigurationMessage(message: JSONObject): Unit = { //TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOO
-     }
+  //todo: questo va fatto solo per la partita interessata
+  private def broadcastConfigurationMessage(message: JSONObject): Unit = {
+    onlineClientIP.foreach((x) => sendConfigurationMessage(x, message))
+  }
 
-  private def notifyOtherClient(excludedClient: String, message: Any): Unit = {
-
-    //TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    /*for (x <- ClientManager.onlineClient) {
-      if (x.ipAddress != excludedClient)
-        sendRemoteMessage(x, message)
-      /*if (x._1 != excludedClient)
-        sendRemoteMessage(x._2, message)*/
-    } */
+  //todo: questo va fatto solo per la partita interessata
+  private def notifyOtherClient(excludedClient: String, message: Any): Unit =  {
+    onlineClientIP.foreach((x) => if (x != excludedClient) sendRemoteMessage(x,message))
   }
 
 

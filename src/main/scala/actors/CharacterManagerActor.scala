@@ -47,7 +47,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
       println(s"Request if the character $characterID is available ")
 
       if (isAvailable(characterID)) {
-        //availableCharacter -= characterID
+
         val character: Map[String, Map[Direction,Image]] = getCharacterData(characterID)
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "availableCharacter",
@@ -123,10 +123,26 @@ class CharacterManagerActor extends UntypedAbstractActor {
     charResList
   }
 
-  //todo
-  private def isAvailable(characterID :String): Boolean = true
+  private def isAvailable(characterID :String): Boolean = {
+    val character: Option[Character] = availableCharacter.find((x) => x.name == characterID)
 
-  //todo
-  private def getCharacterData(characterID: String): Map[String, Map[Direction,Image]]= Map()
+    if (character.isDefined){
+      availableCharacter = availableCharacter.filterNot((x) => x.name == characterID)
+      return true
+    }
+
+    false
+  }
+
+  private def getCharacterData(characterID: String): Map[String, Map[Direction,Image]]= {
+
+    val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
+
+    if(character.isDefined){
+      return Map((character.get.name, character.get.imageList))
+    }
+
+    Map()
+  }
 
 }
