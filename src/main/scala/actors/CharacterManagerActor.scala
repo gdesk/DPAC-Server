@@ -84,17 +84,17 @@ class CharacterManagerActor extends UntypedAbstractActor {
     val pacman: Character = new Character("pacman")
 
     for( x <- Direction.values()){
-      var path24: String = pacman.name.toLowerCase +"/24x24/"
+      var path24: String = pacman.name.toLowerCase +"/24x24"
       pacman.addImage(x,Utils.getImage(path24 + "/" + x.getDirection))
 
-      var path32: String = pacman.name.toLowerCase +"/32x32/"
-      pacman.addImage(x,Utils.getImage(path24 + "/" + x.getDirection))
+      var path32: String = pacman.name.toLowerCase +"/32x32"
+      pacman.addImage(x,Utils.getImage(path32 + "/" + x.getDirection))
 
-      var path48: String = pacman.name.toLowerCase +"/48x48/"
-      pacman.addImage(x,Utils.getImage(path24 + "/" + x.getDirection))
+      var path48: String = pacman.name.toLowerCase +"/48x48"
+      pacman.addImage(x,Utils.getImage(path48 + "/" + x.getDirection))
 
-      var path128: String = pacman.name.toLowerCase +"/128x128/"
-      pacman.addImage(x,Utils.getImage(path24 + "/" + x.getDirection))
+      var path128: String = pacman.name.toLowerCase +"/128x128"
+      pacman.addImage(x,Utils.getImage(path128 + "/" + x.getDirection))
     }
 
     charResList = charResList ::: List (pacman)
@@ -104,17 +104,17 @@ class CharacterManagerActor extends UntypedAbstractActor {
       var ghost: Character = new Character(y)
 
       for (x <- Direction.values()) {
-        var path24: String = "ghosts" + ghost.name.toLowerCase + "/24x24/"
+        var path24: String = "ghosts/" + ghost.name.toLowerCase + "/24x24/"
         pacman.addImage(x, Utils.getImage(path24 + "/" + x.getDirection))
 
-        var path32: String = "ghosts" + ghost.name.toLowerCase + "/32x32/"
-        pacman.addImage(x, Utils.getImage(path24 + "/" + x.getDirection))
+        var path32: String = "ghosts/" + ghost.name.toLowerCase + "/32x32/"
+        pacman.addImage(x, Utils.getImage(path32 + "/" + x.getDirection))
 
-        var path48: String = "ghosts" + ghost.name.toLowerCase + "/48x48/"
-        pacman.addImage(x, Utils.getImage(path24 + "/" + x.getDirection))
+        var path48: String = "ghosts/" + ghost.name.toLowerCase + "/48x48/"
+        pacman.addImage(x, Utils.getImage(path48 + "/" + x.getDirection))
 
-        var path128: String = "ghosts" + ghost.name.toLowerCase + "/128x128/"
-        pacman.addImage(x, Utils.getImage(path24 + "/" + x.getDirection))
+        var path128: String = "ghosts/" + ghost.name.toLowerCase + "/128x128/"
+        pacman.addImage(x, Utils.getImage(path128 + "/" + x.getDirection))
       }
 
       charResList = charResList ::: List (ghost)

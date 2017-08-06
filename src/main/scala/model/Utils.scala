@@ -1,6 +1,7 @@
 package model
 
 import java.awt.Image
+import java.io.File
 import java.net.URL
 import javax.swing.ImageIcon
 
@@ -9,13 +10,16 @@ import javax.swing.ImageIcon
   */
 object Utils {
 
-  val IMAGES_BASE_PATH = "/images/"
+
+
+  val IMAGES_BASE_PATH = "/characters/"
   val IMAGES_EXTENSION = ".png"
 
   def getResource(path: String): URL = Utils.getClass.getResource(path)   //TODO lanciare eccezione nel caso in cui non trovi la risorsa!
 
   def getImage(path: String): Image = {
-    new ImageIcon(getResource(IMAGES_BASE_PATH + path + IMAGES_EXTENSION)).getImage
+    val completePath: String = IMAGES_BASE_PATH + path + IMAGES_EXTENSION
+    new ImageIcon(getResource(completePath)).getImage
   }
 
   def getJavaList[E](list: List[E]): java.util.List[E] = {
@@ -33,4 +37,7 @@ object Utils {
     import scala.collection.JavaConverters._
     map.asScala
   }
+
+
+  def getImageForPlayground(x: File): Image = ???
 }

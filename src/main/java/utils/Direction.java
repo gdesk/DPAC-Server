@@ -6,10 +6,10 @@ package utils;
  * Created by Giulia Lucchi on 28/06/2017.
  */
 public enum Direction {
-    RIGHT("right"),
-    LEFT("left"),
-    DOWN("down"),
-    UP("up");
+    RIGHT("Right"),
+    LEFT("Left"),
+    DOWN("Down"),
+    UP("Up");
 
     private String direction;
 
