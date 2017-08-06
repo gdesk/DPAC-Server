@@ -21,18 +21,15 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    case "newUser" => userMaster ! message
+    case "newUser" => userMaster ! message  //ok
 
-    case "login" => userMaster ! message
+    case "login" => userMaster ! message  //ok
 
-    case "allMatchResult" => userMaster ! message
+    case "allMatchResult" => userMaster ! message //ok
 
-    case "rangesRequest" => matchMaster ! message
+    case "rangesRequest" => matchMaster ! message //ok
 
-    case "selectedRange" => matchMaster ! message
-
-    /// PeerBootstrap
-    case "startGame" => matchMaster ! message
+    case "selectedRange" => matchMaster ! message //ok
 
     case "characterToChooseRequest" => matchMaster ! message
 
@@ -42,14 +39,12 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
     case "chosenPlayground" => matchMaster ! message
 
-    case "matchResult" => matchMaster ! message
+    /// PeerBootstrap
+    case "startGame" => matchMaster ! message
 
-      //todo: Se fosse una stringa sarebbe meglio
     case "serverIsRunning" => matchMaster ! message
 
-
-
-    //case "startGame" => matchMaster ! message
+    case "matchResult" => matchMaster ! message
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }

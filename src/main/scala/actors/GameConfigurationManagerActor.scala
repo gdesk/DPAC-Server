@@ -11,7 +11,15 @@ import scala.util.parsing.json.JSONObject
   */
 class GameConfigurationManagerActor extends UntypedAbstractActor {
 
-  private var availableRange: List[Range] = _
+  private def MIN_PLAYER(v: Int): Int = 3 + 2 * v
+  private def MAX_PLAYER(v: Int): Int = 5 + 2 * v
+
+
+
+
+  private val availableRange: List[Range] = List( Range(MIN_PLAYER(0), MAX_PLAYER(0)),  // 3 - 5
+                                                  Range(MIN_PLAYER(1), MAX_PLAYER(1)),  // 5 - 7
+                                                  Range(MIN_PLAYER(2), MAX_PLAYER(2)))  // 7 - 9
 
   private var waitingMatch: List[Match] = List()
   private var startedMatch: List[Match] = List()
@@ -22,9 +30,11 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     case "rangesRequest" => {
 
-      println("Request for the available ranges ")
+      //todo: Controllare quali sono i valori dei range nel client
 
-      availableRange = getAvailableRanges
+      println("Request for the available ranges")
+
+      //availableRange = getAvailableRanges
 
       sender() ! JSONObject(Map[String, Any](
         "object" -> "ranges",
@@ -44,7 +54,8 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
       if (selectedMatch.isDefined){
         println("Assigned to a match")
-        selectedMatch.get.addPlayer(ip);
+        //TODO: testare se funziona cos' o se devo lavorare sulla lista
+        selectedMatch.get.addPlayer(ip)
       }
 
       else {
@@ -93,11 +104,30 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
+  /*
   //todo: carica i range disponibili
-  private def getAvailableRanges: List[Range] = null
+  private def getAvailableRanges: List[Range] = {
+    if (availableRange.isEmpty) {
+      availableRange = availableRange  ::: List(new Range(MIN_PLAYER_RANGE_1,MAX_PLAYER_RANGE_1,1))
+    }
+
+    availableRange
+  }
+
+  */
 
 
-  private def getWaitingMatchFor( size: Range): List[Match] = waitingMatch.filter((x) => size == x.size)
+  private def getWaitingMatchFor(size: Range): List[Match] = {
+
+    val matches: List[Match] = waitingMatch.filter((x) => size == x.size)
+
+    if (matches.isEmpty) {
+      waitingMatch = waitingMatch ::: List(new Match(List(),size))
+      return waitingMatch
+    }
+
+    matches
+  }
 
   private def getMatchFor(clientIP: String): Match = {
     for ( x <- waitingMatch) {
