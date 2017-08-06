@@ -23,7 +23,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
     case "newUser" => userMaster ! message  //ok
 
-    case "login" => userMaster ! message  //ok
+    case "login" => userMaster ! message  //ok  /////FINO A QUI TESTATO //////
 
     case "allMatchResult" => userMaster ! message //ok
 
@@ -31,7 +31,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
     case "selectedRange" => matchMaster ! message //ok
 
-    case "characterToChooseRequest" => matchMaster ! message
+    case "characterToChooseRequest" => matchMaster ! message  //ok
 
     case "chooseCharacter" => matchMaster ! message
 
