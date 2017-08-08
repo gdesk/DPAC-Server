@@ -119,7 +119,7 @@ object IOUtils {
 
     Source.fromFile(file).foreach(_ match {
       case 'x' => {
-        println("I'm a Block at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a Block at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         blockList.+=(Block(PointImpl(xPosition, yPosition)))
       }
@@ -143,59 +143,56 @@ object IOUtils {
     var xPosition: Int = 0
     var yPosition: Int = 0
 
-
-    //todo : perchè mela, ciliegia, uva e arancia funzionano e gli altri frutti no ???????
-
     Source.fromFile(file).foreach(_ match {
       case '.' => {
-        println("I'm a dot at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a dot at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Dot("", PointImpl(xPosition, yPosition)))
       }
       case 'p' => {
-        println("I'm a pill at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a pill at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Pill("", PointImpl(xPosition, yPosition)))
       }
       case 'a' => {
-        println("I'm an apple at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm an apple at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Apple("", PointImpl(xPosition, yPosition)))
       }
       case 'b' => {
-        println("I'm a bell at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a bell at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Bell("", PointImpl(xPosition, yPosition)))
       }
       case 'c' => {
-        println("I'm a cherry at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a cherry at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Cherry("", PointImpl(xPosition, yPosition)))
       }
       case 's' => {
-        println("I'm a galaxian Ship at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a galaxian Ship at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(GalaxianShip("", PointImpl(xPosition, yPosition)))
       }
       case 'g' => {
-        println("I'm a grapes at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a grapes at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Grapes("", PointImpl(xPosition, yPosition)))
       }
       case 'k' => {
-        println("I'm a key at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm a key at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Key("", PointImpl(xPosition, yPosition)))
       }
 
       case 'o' => {
-        println("I'm an orange at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm an orange at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Orange("", PointImpl(xPosition, yPosition)))
       }
 
       case 's' => {
-        println("I'm an apple at pos [" + xPosition + " | " + yPosition + " ]")
+        //println("I'm an apple at pos [" + xPosition + " | " + yPosition + " ]")
         xPosition = xPosition + 1
         eatableList.+=(Strawberry("", PointImpl(xPosition, yPosition)))
       }

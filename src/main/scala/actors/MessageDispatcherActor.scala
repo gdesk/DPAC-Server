@@ -11,6 +11,7 @@ import scala.util.parsing.json.JSONObject
   */
 class MessageDispatcherActor extends UntypedAbstractActor {
 
+  //todo: Aggioranre come lista di client
   var onlineClientIP: List[String] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
@@ -100,7 +101,6 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     case "notifySelection" => {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
 
-
       notifyOtherClient(ip, message)
     }
 
@@ -151,12 +151,16 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
 
   private def sendRemoteMessage(ipAddress: String, message: Any): Unit = {
-    //val clientActorName = "fakeReceiver"
-    val clientActorName = "messageReceiver"
-    //val receiver: ActorSelection = context.actorSelection("akka.tcp://ClientSystem@" + to.ipAddress + "/user/" + clientActorName)
+    //test locale
+    val clientActorName = "fakeReceiver"
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + clientActorName)
+
+    //test con client
+    //val clientActorName = "messageReceiver"
+    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/" + clientActorName))
     //todo come siamo rimasti per le porte ? -> conviene mandare nel messaggio (Ip + porta)
-    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + to.ipAddress + ":4552" + "/user/" + clientActorName)
-    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/" + clientActorName)
+
+
     receiver ! message
   }
 
@@ -172,6 +176,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   //todo: questo va fatto solo per la partita interessata
   private def broadcastMessage(message: JSONObject): Unit = {
 
+    println("broadcast message to " + onlineClientIP.size + " client")
     onlineClientIP.foreach((x) => sendRemoteMessage(x,message))
   }
 

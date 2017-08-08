@@ -24,6 +24,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
+      //todo: Da completare la creazione delle immagini di un playground
     case "playgrounds" => {
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
@@ -35,6 +36,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
       for( x <- availablePlayground ){
         playgroundImages += ((i, Utils.getImageForPlayground(x)))
+        votedPlayground += i
         i = i +1
       }
 
@@ -48,18 +50,24 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
     case "chosenPlayground" => {
       val vote: Int = message.asInstanceOf[JSONObject].obj("playground").asInstanceOf[Int]
-      val playersNumber: Int = message.asInstanceOf[JSONObject].obj("playersNumber").asInstanceOf[Int]
+      val matchSize: Int = message.asInstanceOf[JSONObject].obj("playersNumber").asInstanceOf[Int]
 
       votedPlayground(vote) = votedPlayground(vote) + 1
       currentVoteCount = currentVoteCount + 1
 
-      if (currentVoteCount == playersNumber){
+      if (currentVoteCount == matchSize){
+        println("Selected Playground !")
         val playground: File = getSelectedPlayground(votedPlayground)
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "playgroundChosen",
                     "playground" -> playground ,
                     "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
+        votedPlayground = new ListBuffer
+        currentVoteCount = 0
       }
+      else
+        println("Waiting for other votes: " + (matchSize - currentVoteCount) + " votes left.")
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
@@ -84,6 +92,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
     fileList
   }
+
 
   private def getSelectedPlayground(votedPlayground: ListBuffer[Int]): File = {
     val selected: Int = votedPlayground.indexOf(votedPlayground.max)
