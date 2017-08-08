@@ -91,6 +91,18 @@ object Main {
       "senderIP" -> "127.0.0.1"
     ))
 
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "selectedRange",
+      "range" -> Range(1,5),
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "selectedRange",
+      "range" -> Range(1,5),
+      "senderIP" -> "127.0.0.1"
+    ))
+
 
 
     messageReceiver ! JSONObject(Map[String, Any](

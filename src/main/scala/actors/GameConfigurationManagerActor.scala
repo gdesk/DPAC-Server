@@ -50,12 +50,13 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
       println("range selected: " + range.toString())
 
-      val selectedMatch: Option[Match] = getWaitingMatchFor(range).headOption
+      val selectedMatch: Option[Match] = getWaitingMatchFor(range) headOption
 
       if (selectedMatch.isDefined){
         println("Assigned to a match")
         //TODO: testare se funziona cos' o se devo lavorare sulla lista
         selectedMatch.get.addPlayer(ip)
+        println("Player in match: " + selectedMatch.get.involvedPlayer.size)
       }
 
       else {
