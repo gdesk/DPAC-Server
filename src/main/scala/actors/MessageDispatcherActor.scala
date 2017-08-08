@@ -122,7 +122,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     case "playgroundChosen" => broadcastMessage(message.asInstanceOf[JSONObject])
 
     case "otherPlayerIP" => {
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      val playerList: List[String] = message.asInstanceOf[JSONObject].obj("playerList").asInstanceOf[List[String]]
+
+      //todo: posso configurare i giocatori per partita in questo punto
       println("sending other player IPs")
 
       sendConfigurationMessage(ip, message)
@@ -151,6 +154,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
 
   private def sendRemoteMessage(ipAddress: String, message: Any): Unit = {
+
+    println("Send message to : " + ipAddress)
     //test locale
     val clientActorName = "fakeReceiver"
     val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + clientActorName)
@@ -166,6 +171,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
   //todo: invio il messaggio ad uno degli attori che è quello della fede (basta beccarlo con la selection).
   private def sendConfigurationMessage(ipAddress: String, message: Any): Unit = {
+
+    println("Send Configuration message to : " + ipAddress)
 
     //todo come siamo rimasti per le porte ? -> come faccio a trovare il tuo Thread per mandargli i messaggi ?
     //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + to.ipAddress + ":4552" + "/ClientWorkerThread")

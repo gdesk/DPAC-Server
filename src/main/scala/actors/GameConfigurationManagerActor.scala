@@ -130,6 +130,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
   }
 
   private def getMatchFor(clientIP: String): Match = {
+
     for ( x <- waitingMatch) {
       val l: List[String] = x.involvedPlayer.filter((x) => x == clientIP)
       if (l.nonEmpty){
