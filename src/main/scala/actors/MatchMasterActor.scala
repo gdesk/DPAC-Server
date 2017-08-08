@@ -29,9 +29,9 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "characterToChooseRequest" => characterManager ! message //ok
 
-    case "chooseCharacter" => characterManager ! message
+    case "chooseCharacter" => characterManager ! message  //ok
 
-    case "playgrounds" => playgroundManager ! message
+    case "playgrounds" => playgroundManager ! message //
 
     case "chosenPlayground" => playgroundManager ! message
 
@@ -48,15 +48,15 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
     ////// LOCAL MESSAGE HANDLER ////////////////////
 
 
-    case "ranges" => clientMessageDispatcher ! message
+    case "ranges" => clientMessageDispatcher ! message  //ok
 
-    case "characterToChoose" => clientMessageDispatcher ! message
+    case "characterToChoose" => clientMessageDispatcher ! message //ok
 
-    case "availableCharacter" => clientMessageDispatcher ! message
+    case "availableCharacter" => clientMessageDispatcher ! message  //ok
 
-    case "notifySelection" => clientMessageDispatcher ! message
+    case "notifySelection" => clientMessageDispatcher ! message //ok
 
-    case "AvailablePlaygrounds" => clientMessageDispatcher ! message
+    case "AvailablePlaygrounds" => clientMessageDispatcher ! message  //ok
 
     case "playgroundChosen" => clientMessageDispatcher ! message
 

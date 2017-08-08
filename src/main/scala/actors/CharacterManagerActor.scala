@@ -3,9 +3,7 @@ package actors
 import java.awt.Image
 
 import akka.actor.UntypedAbstractActor
-import model.Utils
-import utils.Direction
-
+import utils.{Direction, Utils}
 import model.Character
 
 import scala.util.parsing.json.JSONObject
@@ -85,16 +83,16 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     for( x <- Direction.values()){
       var path24: String = pacman.name.toLowerCase +"/24x24"
-      pacman.addImage(x,Utils.getImage(path24 + "/" + x.getDirection))
+      pacman.addImage(x,Utils.getCharacterImage(path24 + "/" + x.getDirection))
 
       var path32: String = pacman.name.toLowerCase +"/32x32"
-      pacman.addImage(x,Utils.getImage(path32 + "/" + x.getDirection))
+      pacman.addImage(x,Utils.getCharacterImage(path32 + "/" + x.getDirection))
 
       var path48: String = pacman.name.toLowerCase +"/48x48"
-      pacman.addImage(x,Utils.getImage(path48 + "/" + x.getDirection))
+      pacman.addImage(x,Utils.getCharacterImage(path48 + "/" + x.getDirection))
 
       var path128: String = pacman.name.toLowerCase +"/128x128"
-      pacman.addImage(x,Utils.getImage(path128 + "/" + x.getDirection))
+      pacman.addImage(x,Utils.getCharacterImage(path128 + "/" + x.getDirection))
     }
 
     charResList = charResList ::: List (pacman)

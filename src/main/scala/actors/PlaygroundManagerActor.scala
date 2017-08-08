@@ -1,8 +1,10 @@
 package actors
 
+import java.awt.Image
 import java.io.File
 
 import akka.actor.UntypedAbstractActor
+import utils.Utils
 
 import scala.collection.mutable.ListBuffer
 import scala.util.parsing.json.JSONObject
@@ -25,11 +27,22 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
     case "playgrounds" => {
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
-      println("Request for the available playground ")
+      println("Request for the available playground image")
+
+      var playgroundImages: Map[Int, Image] = Map()
+
+      var i: Int = 0
+
+      for( x <- availablePlayground ){
+        playgroundImages += ((i, Utils.getImageForPlayground(x)))
+        i = i +1
+      }
+
+      println("Found " + playgroundImages.size + "images")
 
       sender() ! JSONObject(Map[String, Any](
                 "object" -> "AvailablePlaygrounds",
-                "list" -> availablePlayground ,
+                "list" -> playgroundImages ,
                 "senderIP" -> senderIP))
     }
 
@@ -52,8 +65,25 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
-  //todo
-  private def getAvailablePlayground: List[File] = List()
+  //todo: andranno presi dal DB
+  private def getAvailablePlayground: List[File] = {
+
+    //todo: guarda se c'è modo per aprire tuti i file in una cartella
+
+    var fileList: List[File] = List()
+
+    val folder = new File("src/main/resources/playground/")
+    val listOfFiles = folder.listFiles
+
+    for (file <- listOfFiles) {
+      if (file.isFile) {
+        println(file.getName)
+        fileList = fileList ::: List (file)
+      }
+    }
+
+    fileList
+  }
 
   private def getSelectedPlayground(votedPlayground: ListBuffer[Int]): File = {
     val selected: Int = votedPlayground.indexOf(votedPlayground.max)

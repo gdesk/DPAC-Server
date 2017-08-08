@@ -62,6 +62,15 @@ object Main {
       "senderIP" -> "127.0.0.1"
     ))
 
+    messageReceiver ! JSONObject(Map[String, String](
+      "object" -> "playgrounds",
+      "username" -> "myUserName4",
+      "password" -> "pswd",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+
+
 
 
 

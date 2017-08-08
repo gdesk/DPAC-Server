@@ -106,7 +106,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     case "AvailablePlaygrounds" => {
 
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println("sending available playgrounds")
 
