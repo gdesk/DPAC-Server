@@ -68,7 +68,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
     case "startGame" => {
 
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val playerList: List[String] = getMatchFor(senderIP).involvedPlayer
+      val playerList: List[String] = getMatchFor(senderIP).get.involvedPlayer
 
 
       sender() ! JSONObject(Map[String, Any](
@@ -82,16 +82,23 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   val senderIP: String = message.asInstanceOf[JSONObject].obj ("senderIP").toString
 
-    val currentMatch: Match = getMatchFor(senderIP)
+    val currentMatch: Option[Match] = getMatchFor(senderIP)
 
-    currentMatch.addReadyPlayer(senderIP)
+    println("Client match found !")
 
-    if (currentMatch canStart) {
-      sender() ! JSONObject(Map[String, Any](
-        "object" -> "clientCanConnect",
-        "senderIP" -> senderIP
-      ))
+    if(currentMatch.isDefined) {
+      currentMatch.get.addReadyPlayer(senderIP)
 
+      println("Client startup completed !")
+
+      if (currentMatch.get canStart) {
+        println("Client startup completed, can start !")
+        sender() ! JSONObject(Map[String, Any](
+          "object" -> "clientCanConnect",
+          "senderIP" -> senderIP
+        ))
+
+      }
     }
 
   else {
@@ -130,15 +137,15 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
     matches
   }
 
-  private def getMatchFor(clientIP: String): Match = {
+  private def getMatchFor(clientIP: String): Option[Match] = {
 
     for ( x <- waitingMatch) {
       val l: List[String] = x.involvedPlayer.filter((x) => x == clientIP)
       if (l.nonEmpty){
-        return x
+        return Option(x)
       }
     }
-    null
+    Option.empty[Match]
   }
 
   private def getMatch(id:Int): Option[Match] = {

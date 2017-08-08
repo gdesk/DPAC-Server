@@ -21,6 +21,7 @@ class Match (var involvedPlayer: List[String], val size: Range){
   def addReadyPlayer(player: String): Unit = {
     if (involvedPlayer contains player) {
       readyPlayer = readyPlayer + 1
+      println("New ready player, " + (involvedPlayer.size - readyPlayer) + " left.")
     }
   }
 

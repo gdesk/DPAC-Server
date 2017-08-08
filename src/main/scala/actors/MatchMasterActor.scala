@@ -40,7 +40,7 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
     /// PeerBootstrap
     case "startGame" => gameManager ! message //ok
     ///// PeerBootstrap
-    case "serverIsRunning" => gameManager ! message
+    case "serverIsRunning" => gameManager ! message //ok
 
 
     //case "startGame" => peerBootstrapManager ! message
@@ -64,7 +64,7 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "resultSaved" => clientMessageDispatcher ! message
 
-    case "clientCanConnect" => clientMessageDispatcher ! message
+    case "clientCanConnect" => clientMessageDispatcher ! message  //ok
 
     case "previousMatchResult" => clientMessageDispatcher ! message
 

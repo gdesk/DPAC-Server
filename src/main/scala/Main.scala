@@ -62,6 +62,7 @@ object Main {
       "senderIP" -> "127.0.0.1"
     ))
 
+    /*
     messageReceiver ! JSONObject(Map[String, String](
       "object" -> "playgrounds",
       "username" -> "myUserName4",
@@ -84,6 +85,8 @@ object Main {
       "playersNumber" -> 2,
       "senderIP" -> "127.0.0.1"
     ))
+
+    */
 
     messageReceiver ! JSONObject(Map[String, Any](
       "object" -> "selectedRange",
@@ -110,7 +113,25 @@ object Main {
       "senderIP" -> "127.0.0.1"
     ))
 
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
 
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
 
   }
 }
