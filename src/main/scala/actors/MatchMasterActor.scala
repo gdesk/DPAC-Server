@@ -35,7 +35,7 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "chosenPlayground" => playgroundManager ! message  //ok
 
-    case "matchResult" => endGameManager ! message
+    case "matchResult" => endGameManager ! message  //ok
 
     /// PeerBootstrap
     case "startGame" => gameManager ! message //ok
@@ -62,7 +62,7 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "otherPlayerIP" => clientMessageDispatcher ! message //ok
 
-    case "resultSaved" => clientMessageDispatcher ! message
+    // case "resultSaved" => clientMessageDispatcher ! message
 
     case "clientCanConnect" => clientMessageDispatcher ! message  //ok
 

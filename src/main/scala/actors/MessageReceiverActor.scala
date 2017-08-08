@@ -42,9 +42,9 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
     /// PeerBootstrap
     case "startGame" => matchMaster ! message //ok
 
-    case "serverIsRunning" => matchMaster ! message
+    case "serverIsRunning" => matchMaster ! message //ok
 
-    case "matchResult" => matchMaster ! message
+    case "matchResult" => matchMaster ! message //ok
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }

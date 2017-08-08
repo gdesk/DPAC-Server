@@ -131,13 +131,13 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       sendConfigurationMessage(ip, message)
     }
 
-    case "resultSaved" =>  {
+    /*case "resultSaved" =>  {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println("result saved in DB")
 
       sendRemoteMessage(ip, message)
-    }
+    } */
 
       ///// client bootstrap ///////////////////
     case "clientCanConnect" => {
