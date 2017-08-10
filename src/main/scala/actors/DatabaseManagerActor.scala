@@ -1,8 +1,9 @@
 package actors
 
-import akka.actor.{ActorRef, Props, UntypedAbstractActor}
-import akka.serialization.Serialization
-import model.{MatchResult, User}
+import java.util.Calendar
+
+import akka.actor.UntypedAbstractActor
+import model.{MatchResult, MatchResultImpl, User}
 
 import scala.util.parsing.json.JSONObject
 
@@ -94,7 +95,8 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
     case "getPreviousMatchResult" => {
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
-      val resultList: List[MatchResult] = getMatchResultFor(username)
+      //todo: dovrebbe essere una list
+      val resultList: Option[List[Map[String, Any]]] = getMatchResultFor(username)
 
       // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       //Ho un'idea per gestire la sincronizzazione ! si fa una lista di pending come di la, quando arriva il messaggio si lancia il metodo
@@ -115,17 +117,17 @@ class DatabaseManagerActor extends UntypedAbstractActor {
       //todo: gestire match result con il model del client
     case "addResult" => {
       val user: User = message.asInstanceOf[JSONObject].obj("user").asInstanceOf[User]
-      val result: Int = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[Int] // questo poi sarà uno Score
+      val result: MatchResult = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[MatchResult]
 
       println(s"add a new result to db: ($result) from $user ")
-      addResult(user, new MatchResult(42))
+      addResult(user, new MatchResultImpl())
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
   //todo
-  private def getMatchResultFor(username: String): List[MatchResult] =  List()
+  private def getMatchResultFor(username: String): Option[List[Map[String, Any]]] = Option(List(Map ("result" -> true,"score" -> 42, "date" -> Calendar.getInstance())))
 
   //todo
   private def checkAvailableUsername(username: String): Boolean = true
@@ -136,6 +138,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
   //Todo
   private def checkLoginInfo(username: String, password: String): Boolean = true
 
+  //todo
   private def addResult(user: User, result: MatchResult): Boolean = true
 
 }

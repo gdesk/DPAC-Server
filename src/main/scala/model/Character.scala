@@ -1,7 +1,12 @@
 package model
 
 import java.awt.Image
+import java.awt.image.BufferedImage
+import java.io.File
+import java.nio.file.{Files, Path, Paths}
+import javax.swing.ImageIcon
 
+import actors.ActorsUtils
 import utils.Direction
 
 /**
@@ -9,11 +14,17 @@ import utils.Direction
   */
 class Character (val name: String) {
 
-  var imageList: Map[Direction,Image] = Map()
+  var imageList: Map[String,Array[Byte]] = Map()
 
-  def addImage(d: Direction, img: Image) : Unit = {
-    imageList += ((d, img))
+  def addImage(file: File) : Unit = {
+
+    val image: Image = new ImageIcon (file.getPath).getImage
+    val buff: Array[Byte] = ActorsUtils.toByteArray(image)
+    imageList += (file.getPath -> buff)
   }
+
+  //var characterImage: Image = new ImageIcon("src/main/resources/characters/pacman/24x24/Right.png").getImage
+  var characterImage: File = new File("src/main/resources/characters/pacman/24x24/Right.png")
 
 }
 

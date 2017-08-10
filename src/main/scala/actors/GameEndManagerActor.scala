@@ -1,7 +1,9 @@
 package actors
 
+import java.util.Calendar
+
 import akka.actor.{Actor, UntypedAbstractActor}
-import model.User
+import model.{ImmutableUser, MatchResult, User}
 
 import scala.util.parsing.json.JSONObject
 
@@ -13,16 +15,20 @@ class GameEndManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
+      //todo: da aggiustare
     case "matchResult" => {
-      val user: User = message.asInstanceOf[JSONObject].obj("user").asInstanceOf[User]
-      val result: Int = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[Int] // questo poi sarà uno Score
+      val username: String = message.asInstanceOf[JSONObject].obj("user").asInstanceOf[String]
+      val result: Boolean = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[Boolean]
+      val data: Calendar = message.asInstanceOf[JSONObject].obj("date").asInstanceOf[Calendar]
+      val score: Int = message.asInstanceOf[JSONObject].obj("score").asInstanceOf[Int]
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
-      println(s"Received a new result ($result) from $user ")
+      println(s"Received a new result ($result) from $username ")
 
+      //todo: gestire il result
       context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
         "object" -> "addResult",
-        "user" -> user,
+        "user" -> username,
         "result" -> result,
         "senderIP" -> senderIP ))
 

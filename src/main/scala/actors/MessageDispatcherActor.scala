@@ -1,6 +1,11 @@
 package actors
 
+import java.awt.image.BufferedImage
+import java.io.File
+import java.util.Calendar
+
 import akka.actor.{ActorRef, ActorSelection, Props, UntypedAbstractActor}
+import model.MatchResultImpl
 import model.{Client, ClientImpl, MatchResult}
 
 import scala.util.parsing.json.JSONObject
@@ -16,9 +21,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    case "onlineClient" => {
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      onlineClientIP = onlineClientIP ::: List (ip)
+    case "addOnlinePlayer" => {
+      val user: Client = message.asInstanceOf[JSONObject].obj("player").asInstanceOf[Client]
+      //val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      onlineClientIP = onlineClientIP ::: List (user.ip)
     }
 
     case "registrationResult" => {
@@ -62,9 +68,25 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
       println("Login ok ! Previous result loaded !")
 
+      val res: List[Map[String, Any]] = List(Map ("result" -> true,"score" -> 42, "date" -> Calendar.getInstance()))
+
       val reply: JSONObject = JSONObject(Map[String, Any](
         "object" -> "matches",
-        "list" -> message.asInstanceOf[JSONObject].obj("list")))
+        "list" ->  message.asInstanceOf[JSONObject].obj("list"))) //res )) //
+
+      sendRemoteMessage(ip, reply)
+    }
+
+    case "logout" => {
+
+      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+
+
+      //todo: da gestire il logout
+      val reply: JSONObject = JSONObject(Map[String, Any](
+        "object" -> "logoutResponse",
+        "response" ->  true ))
 
       sendRemoteMessage(ip, reply)
     }
@@ -91,7 +113,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     case "availableCharacter" => {
       val available: Boolean = message.asInstanceOf[JSONObject].obj("available").asInstanceOf[Boolean]
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val character: Map[String,Array[Byte]] = message.asInstanceOf[JSONObject].obj("map").asInstanceOf[Map[String,Array[Byte]]]
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println("sending: character is available: " + available)
 
@@ -99,7 +122,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     }
 
     case "notifySelection" => {
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       notifyOtherClient(ip, message)
     }
@@ -156,14 +179,14 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   private def sendRemoteMessage(ipAddress: String, message: Any): Unit = {
 
     println("Send message to : " + ipAddress)
+
     //test locale
-    val clientActorName = "fakeReceiver"
-    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + clientActorName)
+    //val clientActorName = "fakeReceiver"
+    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + clientActorName)
 
     //test con client
-    //val clientActorName = "messageReceiver"
-    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/" + clientActorName))
-    //todo come siamo rimasti per le porte ? -> conviene mandare nel messaggio (Ip + porta)
+    val clientActorName = "fromServerCommunication"
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/" + clientActorName)
 
 
     receiver ! message
@@ -184,6 +207,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   private def broadcastMessage(message: JSONObject): Unit = {
 
     println("broadcast message to " + onlineClientIP.size + " client")
+    //todo: da togliere
+    val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+    //
+    sendRemoteMessage(ip,message)
     onlineClientIP.foreach((x) => sendRemoteMessage(x,message))
   }
 
@@ -193,8 +220,11 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   }
 
   //todo: questo va fatto solo per la partita interessata
+  //todo: mandare all'altro attore (quello che è un attore e non al solito) (FromServerCommunication)
   private def notifyOtherClient(excludedClient: String, message: Any): Unit =  {
-    onlineClientIP.foreach((x) => if (x != excludedClient) sendRemoteMessage(x,message))
+    onlineClientIP.foreach((x) => {
+      if (x != excludedClient) sendRemoteMessage(x,message)
+    })
   }
 
 

@@ -20,8 +20,6 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
   var currentVoteCount: Int = 0
   var votedPlayground: ListBuffer[Int] = new ListBuffer
 
-
-
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
       //todo: Da completare la creazione delle immagini di un playground
@@ -30,17 +28,18 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
       println("Request for the available playground image")
 
-      var playgroundImages: Map[Int, Image] = Map()
+      var playgroundImages: Map[Int, Array[Byte]] = Map()
 
       var i: Int = 0
 
       for( x <- availablePlayground ){
-        playgroundImages += ((i, Utils.getImageForPlayground(x)))
+        playgroundImages += (i -> Utils.getImageForPlayground(x))
         votedPlayground += i
-        i = i +1
+        i = i + 1
       }
 
       println("Found " + playgroundImages.size + "images")
+
 
       sender() ! JSONObject(Map[String, Any](
                 "object" -> "AvailablePlaygrounds",
@@ -50,7 +49,8 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
     case "chosenPlayground" => {
       val vote: Int = message.asInstanceOf[JSONObject].obj("playground").asInstanceOf[Int]
-      val matchSize: Int = message.asInstanceOf[JSONObject].obj("playersNumber").asInstanceOf[Int]
+      val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      val matchSize: Int = getMatchSize(senderIP)//message.asInstanceOf[JSONObject].obj("playersNumber").asInstanceOf[Int]
 
       votedPlayground(vote) = votedPlayground(vote) + 1
       currentVoteCount = currentVoteCount + 1
@@ -63,7 +63,8 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
                     "playground" -> playground ,
                     "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
-        votedPlayground = new ListBuffer
+        //todo: da togliere il commento
+        //votedPlayground = new ListBuffer
         currentVoteCount = 0
       }
       else
@@ -99,5 +100,8 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
     //TODO: gestire i pareggi
     availablePlayground(selected)
   }
+
+  //todo:
+  private def getMatchSize(senderIP: String): Int = 2
 
 }

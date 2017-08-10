@@ -1,6 +1,8 @@
 package actors
 
 import java.awt.Image
+import java.awt.image.BufferedImage
+import java.io.{File, FileOutputStream}
 
 import akka.actor.UntypedAbstractActor
 import utils.{Direction, Utils}
@@ -21,15 +23,13 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     case "characterToChooseRequest"  => {
 
-      println("Request for the available character ")
+      println("Request for the available character")
 
       println("Now available: " + availableCharacter.size)
 
-      var retList: Map[String,Map[Direction,Image]] = Map()
+      var retList: Map[String,File] = Map()
 
-      for (x <- availableCharacter ) {
-        retList += ((x.name, x.imageList))
-      }
+      availableCharacter.foreach( (x) => retList += ((x.name, x.characterImage)) )
 
       sender() ! JSONObject(Map[String, Any](
                 "object" -> "characterToChoose",
@@ -40,13 +40,14 @@ class CharacterManagerActor extends UntypedAbstractActor {
       //dico al client se è disponibile e a tutti gli altri dico che è stato scelto
     case "chooseCharacter" => {
 
-      val characterID: String = message.asInstanceOf[JSONObject].obj("character").toString /*getName*/
+      val characterID: String = message.asInstanceOf[JSONObject].obj("character").toString
 
       println(s"Request if the character $characterID is available ")
 
       if (isAvailable(characterID)) {
 
-        val character: Map[String, Map[Direction,Image]] = getCharacterData(characterID)
+        val character: Map[String,Array[Byte]] = getCharacterData(characterID)
+
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "availableCharacter",
                     "available" -> true ,
@@ -81,18 +82,25 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     val pacman: Character = new Character("pacman")
 
+    var basePath: String = "src/main/resources/characters/"
+
+
+    //todo: leggere i file.......
     for( x <- Direction.values()){
+
       var path24: String = pacman.name.toLowerCase +"/24x24"
-      pacman.addImage(x,Utils.getCharacterImage(path24 + "/" + x.getDirection))
+      val f: File = new File(basePath + path24 + "/" + x.getDirection + ".png")
+      println(f.length())
+      pacman.addImage(f)
 
       var path32: String = pacman.name.toLowerCase +"/32x32"
-      pacman.addImage(x,Utils.getCharacterImage(path32 + "/" + x.getDirection))
+      pacman.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
       var path48: String = pacman.name.toLowerCase +"/48x48"
-      pacman.addImage(x,Utils.getCharacterImage(path48 + "/" + x.getDirection))
+      pacman.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
       var path128: String = pacman.name.toLowerCase +"/128x128"
-      pacman.addImage(x,Utils.getCharacterImage(path128 + "/" + x.getDirection))
+      pacman.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
     }
 
     charResList = charResList ::: List (pacman)
@@ -103,16 +111,16 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
       for (x <- Direction.values()) {
         var path24: String = "ghosts/" + ghost.name.toLowerCase + "/24x24/"
-        pacman.addImage(x, Utils.getImage(path24 + "/" + x.getDirection))
+        ghost.addImage(new File(basePath + path24 + "/" + x.getDirection + ".png"))
 
         var path32: String = "ghosts/" + ghost.name.toLowerCase + "/32x32/"
-        pacman.addImage(x, Utils.getImage(path32 + "/" + x.getDirection))
+        ghost.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
         var path48: String = "ghosts/" + ghost.name.toLowerCase + "/48x48/"
-        pacman.addImage(x, Utils.getImage(path48 + "/" + x.getDirection))
+        ghost.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
         var path128: String = "ghosts/" + ghost.name.toLowerCase + "/128x128/"
-        pacman.addImage(x, Utils.getImage(path128 + "/" + x.getDirection))
+        ghost.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
       }
 
       charResList = charResList ::: List (ghost)
@@ -132,12 +140,13 @@ class CharacterManagerActor extends UntypedAbstractActor {
     false
   }
 
-  private def getCharacterData(characterID: String): Map[String, Map[Direction,Image]]= {
+  private def getCharacterData(characterID: String): Map[String,Array[Byte]] = {
 
     val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
 
     if(character.isDefined){
-      return Map((character.get.name, character.get.imageList))
+
+      return character.get.imageList
     }
 
     Map()

@@ -21,6 +21,7 @@ class RegistrationManagerActor extends UntypedAbstractActor {
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val email: String = message.asInstanceOf[JSONObject].obj("email").toString
       val password: String = message.asInstanceOf[JSONObject].obj("password").toString
+      //val ip: String = ActorsUtils.parseIP(message.asInstanceOf[JSONObject].obj("senderIP").toString)
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
 
