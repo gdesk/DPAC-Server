@@ -11,8 +11,15 @@ import scala.util.parsing.json.JSONObject
   */
 class MessageDispatcherActor extends UntypedAbstractActor {
 
+  //todo: Aggioranre come lista di client
+  var onlineClientIP: List[String] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
+
+    case "onlineClient" => {
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      onlineClientIP = onlineClientIP ::: List (ip)
+    }
 
     case "registrationResult" => {
 
@@ -99,7 +106,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     case "AvailablePlaygrounds" => {
 
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println("sending available playgrounds")
 
@@ -115,19 +122,22 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     case "playgroundChosen" => broadcastMessage(message.asInstanceOf[JSONObject])
 
     case "otherPlayerIP" => {
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      val playerList: List[String] = message.asInstanceOf[JSONObject].obj("playerList").asInstanceOf[List[String]]
+
+      //todo: posso configurare i giocatori per partita in questo punto
       println("sending other player IPs")
 
       sendConfigurationMessage(ip, message)
     }
 
-    case "resultSaved" =>  {
+    /*case "resultSaved" =>  {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println("result saved in DB")
 
       sendRemoteMessage(ip, message)
-    }
+    } */
 
       ///// client bootstrap ///////////////////
     case "clientCanConnect" => {
@@ -144,17 +154,25 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
 
   private def sendRemoteMessage(ipAddress: String, message: Any): Unit = {
-    //val clientActorName = "fakeReceiver"
-    val clientActorName = "messageReceiver"
-    //val receiver: ActorSelection = context.actorSelection("akka.tcp://ClientSystem@" + to.ipAddress + "/user/" + clientActorName)
+
+    println("Send message to : " + ipAddress)
+    //test locale
+    val clientActorName = "fakeReceiver"
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + clientActorName)
+
+    //test con client
+    //val clientActorName = "messageReceiver"
+    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/" + clientActorName))
     //todo come siamo rimasti per le porte ? -> conviene mandare nel messaggio (Ip + porta)
-    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + to.ipAddress + ":4552" + "/user/" + clientActorName)
-    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/" + clientActorName)
+
+
     receiver ! message
   }
 
   //todo: invio il messaggio ad uno degli attori che è quello della fede (basta beccarlo con la selection).
   private def sendConfigurationMessage(ipAddress: String, message: Any): Unit = {
+
+    println("Send Configuration message to : " + ipAddress)
 
     //todo come siamo rimasti per le porte ? -> come faccio a trovare il tuo Thread per mandargli i messaggi ?
     //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + to.ipAddress + ":4552" + "/ClientWorkerThread")
@@ -165,26 +183,18 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   //todo: questo va fatto solo per la partita interessata
   private def broadcastMessage(message: JSONObject): Unit = {
 
-    //TODO OOOOOOOOOOOOOOOOOOOOOO
-
-    //for (x <- ClientManager.onlineClient) {
-      //sendConfigurationMessage(x, message)
-      //sendRemoteMessage(x._2, message)
-    //}
+    println("broadcast message to " + onlineClientIP.size + " client")
+    onlineClientIP.foreach((x) => sendRemoteMessage(x,message))
   }
 
-  private def broadcastConfigurationMessage(message: JSONObject): Unit = { //TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOO
-     }
+  //todo: questo va fatto solo per la partita interessata
+  private def broadcastConfigurationMessage(message: JSONObject): Unit = {
+    onlineClientIP.foreach((x) => sendConfigurationMessage(x, message))
+  }
 
-  private def notifyOtherClient(excludedClient: String, message: Any): Unit = {
-
-    //TODO OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    /*for (x <- ClientManager.onlineClient) {
-      if (x.ipAddress != excludedClient)
-        sendRemoteMessage(x, message)
-      /*if (x._1 != excludedClient)
-        sendRemoteMessage(x._2, message)*/
-    } */
+  //todo: questo va fatto solo per la partita interessata
+  private def notifyOtherClient(excludedClient: String, message: Any): Unit =  {
+    onlineClientIP.foreach((x) => if (x != excludedClient) sendRemoteMessage(x,message))
   }
 
 

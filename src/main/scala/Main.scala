@@ -62,8 +62,76 @@ object Main {
       "senderIP" -> "127.0.0.1"
     ))
 
+    /*
+    messageReceiver ! JSONObject(Map[String, String](
+      "object" -> "playgrounds",
+      "username" -> "myUserName4",
+      "password" -> "pswd",
+      "senderIP" -> "127.0.0.1"
+    ))
 
 
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "chosenPlayground",
+      "playground" -> 1,
+      "playersNumber" -> 2,
+      "senderIP" -> "127.0.0.1"
+    ))
+
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "chosenPlayground",
+      "playground" -> 2,
+      "playersNumber" -> 2,
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    */
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "selectedRange",
+      "range" -> Range(1,5),
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "selectedRange",
+      "range" -> Range(1,5),
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "selectedRange",
+      "range" -> Range(1,5),
+      "senderIP" -> "127.0.0.1"
+    ))
+
+
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "startGame",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
+
+    messageReceiver ! JSONObject(Map[String, Any](
+      "object" -> "serverIsRunning",
+      "senderIP" -> "127.0.0.1"
+    ))
 
   }
 }

@@ -11,7 +11,8 @@ class FakeReceiver extends UntypedAbstractActor{
   override def onReceive(message: Any): Unit = message match {
 
     case x: JSONObject => {
-      println("Received: " + ActorsUtils.messageType(x))
+      print("Message: " + x.obj("object") + " - ")
+      println("Received: " + x.toString())
     }
 
     case x: Boolean => println("Received: " + x)

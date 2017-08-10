@@ -1,6 +1,7 @@
 package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import akka.serialization.Serialization
 import model.{MatchResult, User}
 
 import scala.util.parsing.json.JSONObject
@@ -111,11 +112,20 @@ class DatabaseManagerActor extends UntypedAbstractActor {
           "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
           "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
+      //todo: gestire match result con il model del client
+    case "addResult" => {
+      val user: User = message.asInstanceOf[JSONObject].obj("user").asInstanceOf[User]
+      val result: Int = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[Int] // questo poi sarà uno Score
+
+      println(s"add a new result to db: ($result) from $user ")
+      addResult(user, new MatchResult(42))
+    }
+
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
   //todo
-  private def getMatchResultFor(username: String): List[MatchResult] = null
+  private def getMatchResultFor(username: String): List[MatchResult] =  List()
 
   //todo
   private def checkAvailableUsername(username: String): Boolean = true
@@ -125,5 +135,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
   //Todo
   private def checkLoginInfo(username: String, password: String): Boolean = true
+
+  private def addResult(user: User, result: MatchResult): Boolean = true
 
 }

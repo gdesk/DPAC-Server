@@ -20,17 +20,19 @@ class GameEndManagerActor extends UntypedAbstractActor {
 
       println(s"Received a new result ($result) from $user ")
 
-      saveResultInDB(user, result)
+      context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
+        "object" -> "addResult",
+        "user" -> user,
+        "result" -> result,
+        "senderIP" -> senderIP ))
 
-      sender() ! JSONObject( Map[String, String](
+      /*sender() ! JSONObject( Map[String, String](
                  "object" -> "resultSaved",
                  "senderIP" -> senderIP))
+                 */
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
-
-  //todo
-  private def saveResultInDB(user: User, result: Int): Unit = {}
 
 }
