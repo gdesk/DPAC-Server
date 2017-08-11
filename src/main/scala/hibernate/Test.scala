@@ -11,6 +11,8 @@ object Test extends App{
 
     val session: Session = Utils.getSessionFactory.openSession()
 
+    println("inizia reansazione")
+
     session.beginTransaction()
 
     val link = new Link
