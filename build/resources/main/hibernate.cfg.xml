@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.connection.datasource">
+        java:comp/env/psqlpool</property>
+        <property name="hibernate.bytecode.use_reflection_optimizer">false</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:8888/dpac</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password"></property>
+        <property name="connection.autocommit">true</property>
+
+        <!--<property name="interactive_timeout">864000</property>-->
+        <!--<property name="wait_timeout">864000</property>-->
+
+
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="show_sql">true</property>
+        <mapping class="hibernate.Link"></mapping>
+    </session-factory>
+</hibernate-configuration>
+
