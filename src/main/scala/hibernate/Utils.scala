@@ -3,7 +3,7 @@ package hibernate
 /**
   * Created by chiaravarini on 10/08/17.
   */
-import org.hibernate.cfg.{AnnotationConfiguration, Configuration}
+import org.hibernate.cfg.{AnnotationConfiguration}
 import org.hibernate.SessionFactory
 
 object Utils {
@@ -11,10 +11,8 @@ object Utils {
 
   private def buildSessionFactory: SessionFactory = {
     try {
-      // Create the SessionFactory from hibernate.cfg.xml
-
-      var  configuration = new Configuration().configure( "/resources/hibernate.cfg.xml")
-      return new Configuration().configure().buildSessionFactory();
+      var configuration = new AnnotationConfiguration().configure("/hibernate.cfg.xml")
+      configuration.buildSessionFactory()
 
     } catch {
       case ex: Throwable => {

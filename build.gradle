@@ -20,9 +20,10 @@ dependencies {
     compile 'com.typesafe.akka:akka-remote_2.12:2.5.3'
     testCompile 'com.typesafe.akka:akka-testkit_2.12:2.5.3'
 
-    compile 'org.hibernate:hibernate-core:5.2.10.Final'
+    //compile 'org.hibernate:hibernate-core:5.2.10.Final'
 
-    compile 'org.slf4j:slf4j-api:1.7.5'
+
+    /*compile 'org.slf4j:slf4j-api:1.7.25'
     compile "org.scala-lang:scala-library:2.11.2"
     compile 'edu.uci.ics:crawler4j:3.4'
     compile 'mysql:mysql-connector-java:5.1.9'
@@ -31,9 +32,25 @@ dependencies {
     compile 'commons-logging:commons-logging:1.1.1'
     compile 'commons-collections:commons-collections:3.2.1'
     compile 'cglib:cglib:2.2'
+    compile 'javax.transaction:jta:1.1'*/
+
+
+    // sql version 5.5.25a in xammp COMPATIBLE mysql connector 5.1.5
+    //https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-versions.html
+
+    compile 'org.slf4j:slf4j-api:1.7.25'
+    compile "org.scala-lang:scala-library:2.11.2"
+    compile 'edu.uci.ics:crawler4j:3.4'
+    compile 'mysql:mysql-connector-java:5.1.43'
+    compile 'org.hibernate:hibernate-entitymanager:3.3.2.GA'
+    compile 'dom4j:dom4j:1.6.1'
+    compile 'commons-logging:commons-logging:1.1.1'
+    compile 'commons-collections:commons-collections:3.2.1'
+    compile 'cglib:cglib:2.2'
     compile 'javax.transaction:jta:1.1'
 
-    testCompile "junit:junit:4.11"
+
+
 }
 
 sourceSets {

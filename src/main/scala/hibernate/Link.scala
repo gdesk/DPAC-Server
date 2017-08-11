@@ -7,12 +7,12 @@ import javax.persistence._
 
 @Entity
 @Table(name = "links")
-class Link(url: String) {
+class Link() {
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   var id: Int = _
 
   var status: String = _
 
-  override def toString = id + ")" + url
+  override def toString = id + ")"
 }
