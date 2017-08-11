@@ -17,6 +17,8 @@ object Test extends App{
 
     link.status = "provaStatus"
 
+    session.save(link)
+
     session.getTransaction.commit()
 
     session.close()
