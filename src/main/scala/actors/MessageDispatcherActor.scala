@@ -144,6 +144,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     case "playgroundChosen" => broadcastMessage(message.asInstanceOf[JSONObject])
 
+      //TODO: Manca getTeamCharacter -> vedi file condiviso
+
     case "otherPlayerIP" => {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
       val playerList: List[String] = message.asInstanceOf[JSONObject].obj("playerList").asInstanceOf[List[String]]
@@ -166,7 +168,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     case "clientCanConnect" => {
       val reply: JSONObject = JSONObject(Map[String, Any](
         //result" -> PeerBootstrapMessages.CLIENT_CAN_START_RUNNING,
-        "result" -> "ClientCanStartRunning"))
+        "object" -> "ClientCanStartRunning"))
 
       broadcastConfigurationMessage(reply)
     }
@@ -178,7 +180,9 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
   private def sendRemoteMessage(ipAddress: String, message: Any): Unit = {
 
-    println("Send message to : " + ipAddress)
+    val msgType: String = ActorsUtils.messageType(message)
+
+    println("Send message [ " + msgType + "]to : " + ipAddress)
 
     //test locale
     //val clientActorName = "fakeReceiver"
@@ -198,8 +202,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     println("Send Configuration message to : " + ipAddress)
 
     //todo come siamo rimasti per le porte ? -> come faccio a trovare il tuo Thread per mandargli i messaggi ?
-    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + to.ipAddress + ":4552" + "/ClientWorkerThread")
-    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + "fakeReceiver")
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/P2PCommunication")
+    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + "fakeReceiver")
     receiver ! message
   }
 

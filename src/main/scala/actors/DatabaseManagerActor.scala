@@ -129,7 +129,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
   //todo
   private def getMatchResultFor(username: String): Option[List[Map[String, Any]]] = Option(List(Map ("result" -> true,"score" -> 42, "date" -> Calendar.getInstance())))
 
-  //todo
+  //todo non serve perchè lo fa già in automatico con add
   private def checkAvailableUsername(username: String): Boolean = true
 
   //todo

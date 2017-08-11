@@ -18,9 +18,9 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
 
   //todo: controllare se sono i range giusti
-  private val availableRange: List[Range] = List( Range(MIN_PLAYER(0), MAX_PLAYER(0)),  // 3 - 5
-                                                  Range(MIN_PLAYER(1), MAX_PLAYER(1)),  // 5 - 7
-                                                  Range(MIN_PLAYER(2), MAX_PLAYER(2)))  // 7 - 9
+  private val availableRange: List[Range] = List( Range(3, 5),  // 3 - 5
+                                                  Range(6, 9))  // 5 - 7
+                                                  //Range(10, 15))  // 7 - 9
 
   private var waitingMatch: List[Match] = List()
   private var startedMatch: List[Match] = List()
@@ -55,7 +55,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
       if (selectedMatch.isDefined){
         println("Assigned to a match")
-        //TODO: testare se funziona cos' o se devo lavorare sulla lista
+        //TODO: controlla se c'è già ip altrimenti dai errore
         selectedMatch.get.addPlayer(ip)
         println("Player in match: " + selectedMatch.get.involvedPlayer.size)
       }
@@ -66,7 +66,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     }
 
-    case "startGame" => {
+    /*case "startGame" => {
 
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
       val playerList: List[String] = getMatchFor(senderIP).get.involvedPlayer
@@ -76,7 +76,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
         "object" -> "otherPlayerIP",
         "playerList" -> playerList,
         "senderIP" -> senderIP))
-    }
+    }*/
 
 
   case "serverIsRunning" => {
@@ -92,14 +92,14 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
       println("Client startup completed !")
 
-      if (currentMatch.get canStart) {
+      //if (currentMatch.get canStart) {
         println("Client startup completed, can start !")
         sender() ! JSONObject(Map[String, Any](
           "object" -> "clientCanConnect",
           "senderIP" -> senderIP
         ))
 
-      }
+      //}
     }
 
   else {
@@ -112,18 +112,6 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
-
-  /*
-  //todo: carica i range disponibili
-  private def getAvailableRanges: List[Range] = {
-    if (availableRange.isEmpty) {
-      availableRange = availableRange  ::: List(new Range(MIN_PLAYER_RANGE_1,MAX_PLAYER_RANGE_1,1))
-    }
-
-    availableRange
-  }
-
-  */
 
 
   private def getWaitingMatchFor(size: Range): List[Match] = {

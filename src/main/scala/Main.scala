@@ -15,8 +15,8 @@ object Main {
   def main(args: Array[String]): Unit = {
 
     val config = ConfigFactory.parseFile(new File("src/dpacServer.conf"))
-    //val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
-    //config.resolve()
+    val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
+    config.resolve()
     /*val config = ConfigFactory.parseString(
       " akka { " +
         " actor {" +
