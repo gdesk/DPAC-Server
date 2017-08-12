@@ -15,8 +15,6 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
   private def MAX_PLAYER(v: Int): Int = 5 + 2 * v
 
 
-
-
   //todo: controllare se sono i range giusti
   private val availableRange: List[Range] = List( Range(3, 5),  // 3 - 5
                                                   Range(6, 9))  // 5 - 7
@@ -44,6 +42,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     }
 
+      //todo: controllare se fuzniona la creazione di una nuova quando non lo trova
     case "selectedRange" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -54,10 +53,18 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       val selectedMatch: Option[Match] = getWaitingMatchFor(range) headOption
 
       if (selectedMatch.isDefined){
-        println("Assigned to a match")
-        //TODO: controlla se c'è già ip altrimenti dai errore
-        selectedMatch.get.addPlayer(ip)
-        println("Player in match: " + selectedMatch.get.involvedPlayer.size)
+        if (selectedMatch.get.addPlayer(ip)) {
+          println("Assigned to a match")
+          println("Player in match: " + selectedMatch.get.involvedPlayer.size)
+
+          sender() ! JSONObject(Map[String, Any](
+            "object" -> "newPlayerInMatch",
+            "match" -> selectedMatch.get ))
+        }
+
+        else{
+          System.err.println("Player Already in match, cannot add")
+        }
       }
 
       else {
@@ -65,18 +72,6 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       }
 
     }
-
-    /*case "startGame" => {
-
-      val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val playerList: List[String] = getMatchFor(senderIP).get.involvedPlayer
-
-
-      sender() ! JSONObject(Map[String, Any](
-        "object" -> "otherPlayerIP",
-        "playerList" -> playerList,
-        "senderIP" -> senderIP))
-    }*/
 
 
   case "serverIsRunning" => {
@@ -92,14 +87,14 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
       println("Client startup completed !")
 
-      //if (currentMatch.get canStart) {
+      if (currentMatch.get canStart) {
         println("Client startup completed, can start !")
         sender() ! JSONObject(Map[String, Any](
           "object" -> "clientCanConnect",
           "senderIP" -> senderIP
         ))
 
-      //}
+      }
     }
 
   else {

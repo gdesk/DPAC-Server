@@ -5,8 +5,7 @@ import java.io.File
 import java.util.Calendar
 
 import akka.actor.{ActorRef, ActorSelection, Props, UntypedAbstractActor}
-import model.MatchResultImpl
-import model.{Client, ClientImpl, MatchResult}
+import model._
 
 import scala.util.parsing.json.JSONObject
 
@@ -15,8 +14,9 @@ import scala.util.parsing.json.JSONObject
   * @author manuBottax
   */
 class MessageDispatcherActor extends UntypedAbstractActor {
-  
+
   var onlineClient: List[Client] = List()
+  var onlineMatch: List[Match] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
@@ -118,6 +118,13 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       sendRemoteMessage(ip, reply)
     }
 
+    case "newPlayerInMatch" => {
+
+      val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
+
+      onlineMatch = onlineMatch ::: List(currentMatch)
+    }
+
     case "characterToChoose" => {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
@@ -128,7 +135,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     case "availableCharacter" => {
       val available: Boolean = message.asInstanceOf[JSONObject].obj("available").asInstanceOf[Boolean]
-      val character: Map[String,Array[Byte]] = message.asInstanceOf[JSONObject].obj("map").asInstanceOf[Map[String,Array[Byte]]]
+      //val character: Map[String,Array[Byte]] = message.asInstanceOf[JSONObject].obj("map").asInstanceOf[Map[String,Array[Byte]]]
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println("sending: character is available: " + available)
@@ -157,7 +164,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     }
 
-    case "playgroundChosen" => broadcastMessage(message.asInstanceOf[JSONObject])
+    case "playgroundChosen" => {
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      broadcastMessage(ip, message.asInstanceOf[JSONObject])
+    }
 
       //TODO: Manca getTeamCharacter -> vedi file condiviso
 
@@ -181,11 +191,13 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
       ///// client bootstrap ///////////////////
     case "clientCanConnect" => {
+
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+
       val reply: JSONObject = JSONObject(Map[String, Any](
-        //result" -> PeerBootstrapMessages.CLIENT_CAN_START_RUNNING,
         "object" -> "ClientCanStartRunning"))
 
-      broadcastConfigurationMessage(reply)
+      broadcastConfigurationMessage(ip, reply)
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
@@ -211,40 +223,64 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     receiver ! message
   }
 
-  //todo: invio il messaggio ad uno degli attori che è quello della fede (basta beccarlo con la selection).
   private def sendConfigurationMessage(ipAddress: String, message: Any): Unit = {
 
     println("Send Configuration message to : " + ipAddress)
 
-    //todo come siamo rimasti per le porte ? -> come faccio a trovare il tuo Thread per mandargli i messaggi ?
     val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/P2PCommunication")
-    //val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacServer@" + ipAddress + ":4552" + "/user/" + "fakeReceiver")
+    receiver ! message
+  }
+  
+  //todo: da testare
+  private def sendNotificationMessage(ipAddress: String, message: Any): Unit = {
+
+    println("Send notification message to : " + ipAddress)
+
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/FromServerCommunication")
     receiver ! message
   }
 
-  //todo: questo va fatto solo per la partita interessata
-  private def broadcastMessage(message: JSONObject): Unit = {
+  //todo: da testare
+  private def broadcastMessage(ip: String, message: JSONObject): Unit = {
 
-    println("broadcast message to " + onlineClient.size + " client")
-    onlineClient.foreach((x) => sendRemoteMessage(x.ip,message))
+    val ipList: List[String] = getMatchFor(ip).get.involvedPlayer
+
+    if (ipList.nonEmpty){
+      println("broadcast message to " + ipList.size + " client")
+      ipList.foreach((x) => sendRemoteMessage(x,message))
+    }
+
+
   }
 
-  //todo: questo va fatto solo per la partita interessata
-  private def broadcastConfigurationMessage(message: JSONObject): Unit = {
-    onlineClient.foreach((x) => sendConfigurationMessage(x.ip, message))
+  //todo: da testare
+  private def broadcastConfigurationMessage(ip: String, message: JSONObject): Unit = {
+    val ipList: List[String] = getMatchFor(ip).get.involvedPlayer
+
+    if (ipList.nonEmpty){
+      println("broadcast message to " + ipList.size + " client")
+      ipList.foreach((x) => sendConfigurationMessage(x,message))
+    }
   }
 
-  //todo: questo va fatto solo per la partita interessata
-  //todo: mandare all'altro attore (quello che è un attore e non al solito) (FromServerCommunication)
+
+  //todo: da testare
   private def notifyOtherClient(excludedClient: String, message: Any): Unit =  {
-    onlineClient.foreach((x) => {
-      if (x.ip != excludedClient) sendRemoteMessage(x.ip,message)
-    })
+    val ipList: List[String] = getMatchFor(excludedClient).get.involvedPlayer
+
+    if (ipList.nonEmpty){
+      println("sending notification to " + ipList.size + " clients")
+      ipList.foreach((x) => if (x != excludedClient) sendNotificationMessage(x,message))
+    }
   }
 
 
   private def getClient(username: String): Option[Client] =  {
     onlineClient.find((x) => x.username == username)
+  }
+
+  private def getMatchFor(ip: String): Option[Match] = {
+    onlineMatch.find((x) => x.involvedPlayer.contains(ip))
   }
 
 

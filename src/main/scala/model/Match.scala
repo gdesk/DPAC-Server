@@ -14,8 +14,16 @@ class Match (var involvedPlayer: List[String], val size: Range){
 
   var readyPlayer: Int = 0
 
-  def addPlayer (player: String): Unit = {
-    involvedPlayer = involvedPlayer ::: List(player)
+  def addPlayer (player: String): Boolean = {
+    var addedToMatch: Boolean = false
+    val list =  involvedPlayer.find((x) => x == player)
+
+    if(list.isEmpty) {
+      involvedPlayer = involvedPlayer ::: List(player)
+      addedToMatch = true
+    }
+
+    addedToMatch
   }
 
   def addReadyPlayer(player: String): Unit = {
