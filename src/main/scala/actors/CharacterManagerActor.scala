@@ -16,8 +16,11 @@ import scala.util.parsing.json.JSONObject
   */
 class CharacterManagerActor extends UntypedAbstractActor {
 
+  //todo: questa classe non gestisce più partite in concorrenza
+
   val playableCharacter: List[Character] = getPlayableCharacters
   var availableCharacter: List[Character] = playableCharacter
+  var selectedCharacter: List[Character] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
@@ -41,12 +44,15 @@ class CharacterManagerActor extends UntypedAbstractActor {
     case "chooseCharacter" => {
 
       val characterID: String = message.asInstanceOf[JSONObject].obj("character").toString
+      val senderIp: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println(s"Request if the character $characterID is available ")
 
-      if (isAvailable(characterID)) {
+      if (isAvailable(characterID, senderIp)) {
 
         val character: Map[String,Array[Byte]] = getCharacterData(characterID)
+
+        selectedCharacter = selectedCharacter ::: List(getCharacter(characterID))
 
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "availableCharacter",
@@ -67,7 +73,30 @@ class CharacterManagerActor extends UntypedAbstractActor {
       }
     }
 
-    case "choosenCharacter" => println("ti devo inviare il pacchetto completo del personaggio")
+
+    case "teamCharacterRequest" => {
+
+      println(s"Request data for all the match character")
+
+      var characterList: Map[String, Map[String, Array[Byte]]] = Map()
+
+      selectedCharacter.foreach((x) => characterList += (x.name -> getCharacterData(x.name)) )
+
+      var associationMap: Map[String, Array[String]] = Map()
+
+      selectedCharacter.foreach((x) => associationMap += (x.ownerIP -> Array(x.getType, x.name)) )
+
+
+        sender() ! JSONObject(Map[String, Any](
+          "object" -> "characterChosen",
+          "map" -> characterList,
+          "typeCharacters" -> associationMap,
+          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
+      //ho finito e quindi reinizializzo le liste ai valori iniziali per poter gestire la prossima partita
+      cleanCharacterManager()
+
+    }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
@@ -76,7 +105,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
   private def getPlayableCharacters: List[Character] = {
 
 
-    //TODO: Andrà letta dal database !!!!
+    //TODO: Andrà letta dal database ????
 
     var charResList: List[Character] = List()
 
@@ -107,19 +136,19 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     for (y <- List("blue", "pink", "red", "yellow")) {
 
-      var ghost: Character = new Character(y)
+      val ghost: Character = new Character(y)
 
       for (x <- Direction.values()) {
-        var path24: String = "ghosts/" + ghost.name.toLowerCase + "/24x24/"
+        val path24: String = "ghosts/" + ghost.name.toLowerCase + "/24x24/"
         ghost.addImage(new File(basePath + path24 + "/" + x.getDirection + ".png"))
 
-        var path32: String = "ghosts/" + ghost.name.toLowerCase + "/32x32/"
+        val path32: String = "ghosts/" + ghost.name.toLowerCase + "/32x32/"
         ghost.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
-        var path48: String = "ghosts/" + ghost.name.toLowerCase + "/48x48/"
+        val path48: String = "ghosts/" + ghost.name.toLowerCase + "/48x48/"
         ghost.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
-        var path128: String = "ghosts/" + ghost.name.toLowerCase + "/128x128/"
+        val path128: String = "ghosts/" + ghost.name.toLowerCase + "/128x128/"
         ghost.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
       }
 
@@ -129,15 +158,22 @@ class CharacterManagerActor extends UntypedAbstractActor {
     charResList
   }
 
-  private def isAvailable(characterID :String): Boolean = {
+  private def isAvailable(characterID :String, ownerIP: String): Boolean = {
     val character: Option[Character] = availableCharacter.find((x) => x.name == characterID)
 
     if (character.isDefined){
       availableCharacter = availableCharacter.filterNot((x) => x.name == characterID)
+      character.get.ownerIP = ownerIP
       return true
     }
 
     false
+  }
+
+  private def getCharacter(characterID :String): Character = {
+    val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
+
+    character.get
   }
 
   private def getCharacterData(characterID: String): Map[String,Array[Byte]] = {
@@ -150,6 +186,11 @@ class CharacterManagerActor extends UntypedAbstractActor {
     }
 
     Map()
+  }
+
+  private def cleanCharacterManager(): Unit = {
+    selectedCharacter = List()
+    availableCharacter = playableCharacter
   }
 
 }

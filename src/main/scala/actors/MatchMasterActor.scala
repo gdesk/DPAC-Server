@@ -31,6 +31,8 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "chooseCharacter" => characterManager ! message  //ok
 
+    case "teamCharacterRequest" => characterManager ! message
+
     case "playgrounds" => playgroundManager ! message //da completare
 
     case "chosenPlayground" => playgroundManager ! message  //ok
@@ -57,6 +59,8 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
     case "availableCharacter" => clientMessageDispatcher ! message  //ok
 
     case "notifySelection" => clientMessageDispatcher ! message //ok
+
+    case "characterChosen" => clientMessageDispatcher ! message //
 
     case "AvailablePlaygrounds" => clientMessageDispatcher ! message  //ok
 

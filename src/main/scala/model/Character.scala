@@ -15,6 +15,14 @@ import utils.Direction
 class Character (val name: String) {
 
   var imageList: Map[String,Array[Byte]] = Map()
+  var ownerIP: String = ""
+
+  def getType: String = {
+    if (name == "pacman")
+      "pacman"
+    else
+      "ghost"
+  }
 
   def addImage(file: File) : Unit = {
 

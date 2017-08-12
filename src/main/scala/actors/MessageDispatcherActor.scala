@@ -169,7 +169,13 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       broadcastMessage(ip, message.asInstanceOf[JSONObject])
     }
 
-      //TODO: Manca getTeamCharacter -> vedi file condiviso
+    case "characterChosen" => {
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+
+      println("sending character list for this match")
+
+      sendRemoteMessage(ip, message)
+    }
 
     case "otherPlayerIP" => {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -230,7 +236,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/P2PCommunication")
     receiver ! message
   }
-  
+
   //todo: da testare
   private def sendNotificationMessage(ipAddress: String, message: Any): Unit = {
 

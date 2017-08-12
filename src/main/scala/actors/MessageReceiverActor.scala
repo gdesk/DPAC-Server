@@ -41,7 +41,8 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
       case "chooseCharacter" => matchMaster ! message // ok
 
-        //todo: manca getTeamCharacter
+      // todo: da testare
+      case "teamCharacterRequest" => matchMaster ! message
 
         //todo: mancano messaggi per amici -> vedi foglio
 
