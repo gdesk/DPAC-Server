@@ -80,10 +80,12 @@ object DatabaseQuery {
     * @param username username of player
     * @param password password of player
     *
-    * @return true if the login ended good
-    *         false if username not exist or password is wrong.
+    * @return logged                if login ended good
+    *         passwordWrong         if the password is wrong
+    *         unregisteredUsername  if the username is wrong or unregistered
+    *
     */
-  def checkLogin(username: String, password: String): Boolean ={
+  def checkLogin(username: String, password: String): String ={
     try {
       val statement = connection.createStatement()
       val query = "SELECT username, password FROM user WHERE username = ?"
@@ -94,20 +96,29 @@ object DatabaseQuery {
         val username = resultSet.getString("username")
         val psw = resultSet.getString("password")
         if(password.equals(psw)){
-          println("login riuscito.")
-          return true
+          println("Login effettuato.")
+          return "logged"
         }else{
-          println("password sbagliata.")
-          return false
+          println("password sbagliata. Riprova.")
+          return "passwordWrong"
         }
       }
     } catch {
       case e => e.printStackTrace
     }
     println("username sbagliato. Sei già registrato?")
-    false
+    "unregisteredUsername"
   }
 
+  /**
+    * Adds the results of the game just finished.
+    *
+    * @param username id of player
+    * @param matchResult the information of result of match
+    *
+    * @return true  if match added
+    *         false if username is not valid.
+    */
   def addMatchResult(username: String, matchResult: MatchResult): Boolean ={
     try {
       val statement = connection.createStatement()
@@ -127,8 +138,7 @@ object DatabaseQuery {
     println("Match added.")
     true
   }
-
-
+  
   /**
     * Convert sql.Date to Calendar object.
     *
@@ -136,8 +146,8 @@ object DatabaseQuery {
     * @return same darte in Calendar object
     */
  private def toCalendar(date: Date): Calendar = {
-    val cal = Calendar.getInstance
-    cal.setTime(date)
-    cal
+    val calendar = Calendar.getInstance
+    calendar.setTime(date)
+    calendar
   }
 }
