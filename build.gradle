@@ -19,6 +19,7 @@ dependencies {
     compile 'com.typesafe.akka:akka-actor_2.12:2.5.3'
     compile 'com.typesafe.akka:akka-remote_2.12:2.5.3'
     testCompile 'com.typesafe.akka:akka-testkit_2.12:2.5.3'
+    compile 'mysql:mysql-connector-java:5.1.43'
 }
 
 sourceSets {
