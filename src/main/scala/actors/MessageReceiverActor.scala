@@ -13,40 +13,52 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
   override def preStart(): Unit = {
 
-    userMaster = context.actorOf(UserMasterActor.props(messageDispatcher) , "userMaster")
-    matchMaster = context.actorOf(MatchMasterActor.props(messageDispatcher) , "matchMaster")
+    userMaster = context.actorOf(UserMasterActor.props(messageDispatcher), "userMaster")
+    matchMaster = context.actorOf(MatchMasterActor.props(messageDispatcher), "matchMaster")
     super.preStart()
 
   }
 
-  override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
+  override def onReceive(message: Any): Unit = {
 
-    case "newUser" => userMaster ! message  //ok
+    println("Received a new message !")
 
-    case "login" => userMaster ! message  //ok  /////FINO A QUI TESTATO //////
+    ActorsUtils.messageType(message) match {
 
-    case "allMatchResult" => userMaster ! message //ok
+      case "newUser" => userMaster ! message //ok
 
-    case "rangesRequest" => matchMaster ! message //ok
+      case "login" => userMaster ! message // ok
 
-    case "selectedRange" => matchMaster ! message //ok
+      case "logout" => userMaster ! message // ok
 
-    case "characterToChooseRequest" => matchMaster ! message  //ok
+      case "allMatchResult" => userMaster ! message // ok
 
-    case "chooseCharacter" => matchMaster ! message //ok
+      case "rangesRequest" => matchMaster ! message //ok
 
-    case "playgrounds" => matchMaster ! message //da completare
+      case "selectedRange" => matchMaster ! message // ok
 
-    case "chosenPlayground" => matchMaster ! message  // ok
+      case "characterToChooseRequest" => matchMaster ! message //ok
 
-    /// PeerBootstrap
-    case "startGame" => matchMaster ! message //ok
+      case "chooseCharacter" => matchMaster ! message // ok
 
-    case "serverIsRunning" => matchMaster ! message //ok
+        //todo: manca getTeamCharacter
 
-    case "matchResult" => matchMaster ! message //ok
+        //todo: mancano messaggi per amici -> vedi foglio
 
-    case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
+      case "playgrounds" => matchMaster ! message // ok
+
+      case "chosenPlayground" => matchMaster ! message // ok
+
+      /// PeerBootstrap
+      case "startGame" => matchMaster ! message //
+
+      case "serverIsRunning" => matchMaster ! message //
+
+      case "matchResult" => matchMaster ! message //
+
+      case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
+    }
+
   }
 
 }

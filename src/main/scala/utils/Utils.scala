@@ -5,6 +5,7 @@ import java.io.File
 import java.net.URL
 import javax.swing.{ImageIcon, JComponent, JFrame}
 
+import actors.ActorsUtils
 import clientModel.model.Playground
 import view.view.playground.{PlaygroundBuilderImpl, PlaygroundPanel, PlaygroundSettings, PlaygroundView}
 import view.view.utils.ImagesResolutions
@@ -54,7 +55,7 @@ object Utils {
     map.asScala
   }
 
-  def getImageForPlayground(playgroundFile: File): Image = {
+  def getImageForPlayground(playgroundFile: File): Array[Byte] = {
 
     val playground: Playground = IOUtils.getPlaygroundFromFile(playgroundFile)
 
@@ -70,7 +71,9 @@ object Utils {
 
     saveComponentAsJPEG(view, "" + playgroundFile.getName + ".jpg" )
 
-    new ImageIcon("playgroundImages/" + playgroundFile.getName + ".jpg").getImage
+    val playgroundImage: Image = new ImageIcon("playgroundImages/" + playgroundFile.getName + ".jpg").getImage
+
+    ActorsUtils.toByteArray(playgroundImage)
 
   }
 

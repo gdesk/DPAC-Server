@@ -17,6 +17,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
 
 
+  //todo: controllare se sono i range giusti
   private val availableRange: List[Range] = List( Range(MIN_PLAYER(0), MAX_PLAYER(0)),  // 3 - 5
                                                   Range(MIN_PLAYER(1), MAX_PLAYER(1)),  // 5 - 7
                                                   Range(MIN_PLAYER(2), MAX_PLAYER(2)))  // 7 - 9
@@ -60,7 +61,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       }
 
       else {
-        println("No Available Match for this range")
+        println("No Available Match for this range, create a new One")
       }
 
     }

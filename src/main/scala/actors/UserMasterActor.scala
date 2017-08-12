@@ -10,14 +10,14 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
   var databaseManager: ActorRef = _
   var loginManager: ActorRef = _
   var registrationManager: ActorRef = _
-  var clientManager: ActorRef = _
+  //var clientManager: ActorRef = _
 
   override def preStart(): Unit = {
 
     databaseManager = context.actorOf(Props[DatabaseManagerActor] , "databaseManager")
     loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
     registrationManager = context.actorOf(Props[RegistrationManagerActor] , "registrationManager")
-    clientManager = context.actorOf(Props[ClientManagerActor], "clientManager")
+    //clientManager = context.actorOf(Props[ClientManagerActor], "clientManager")
 
     super.preStart()
   }
@@ -27,6 +27,8 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
     case "newUser" => registrationManager ! message
 
     case "login" => loginManager ! message
+
+    case "logout" => clientMessageDispatcher ! message
 
     case "allMatchResult" => databaseManager ! message
 
@@ -45,15 +47,14 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
           val client: Client = new ClientImpl(ip, username)
 
-          context.actorSelection("clientManager") ! JSONObject(Map[String, Any](
+          //todo: manda al client message dispatcher
+          clientMessageDispatcher ! JSONObject(Map[String, Any](
                     "object" -> "addOnlinePlayer",
-                    "player" -> client ))
+                    "player" -> client,
+                    "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
           println(s"Player $username connected from $ip !" )
 
-          clientMessageDispatcher ! JSONObject(Map[String, String](
-                                    "object" -> "onlineClient",
-                                    "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
 
           databaseManager ! JSONObject(Map[String, String](
             "object" -> "getPreviousMatchResult",
