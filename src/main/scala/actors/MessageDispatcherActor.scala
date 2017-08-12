@@ -18,6 +18,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   var onlineClient: List[Client] = List()
   var onlineMatch: List[Match] = List()
 
+  var pendingFriendRequest: Map[String, String] = Map()
+
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
     case "addOnlinePlayer" => {
@@ -136,6 +138,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
       if (friend.isDefined) {
         val friendIP: String = friend.get.ip
+        pendingFriendRequest += (friendIP -> senderIP)
         val request: JSONObject = JSONObject(Map[String, Any](
           "object" -> "friendRequest",
           "senderRequest" -> senderUsername,
@@ -156,10 +159,11 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     }
 
     case "responseFriend" => {
-      //the ip of the original sender of the request
-      val friendIP: String = message.asInstanceOf[JSONObject].obj("friendIP").toString
+
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
       val response: Boolean = message.asInstanceOf[JSONObject].obj("response").asInstanceOf[Boolean]
+
+      val friendIP: String = pendingFriendRequest(senderIP)
 
       if (response) {
         val currentMatch: Match = getMatchFor(friendIP).get
@@ -185,6 +189,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
         sendRemoteMessage(friendIP, reply)
       }
+
+      pendingFriendRequest -= senderIP
     }
 
     case "characterToChoose" => {
