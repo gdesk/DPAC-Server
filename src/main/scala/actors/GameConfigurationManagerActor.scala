@@ -21,7 +21,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
                                                   //Range(10, 15))  // 7 - 9
 
   private var waitingMatch: List[Match] = List()
-  private var startedMatch: List[Match] = List()
+
 
 
 
@@ -76,13 +76,13 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   case "serverIsRunning" => {
 
-  val senderIP: String = message.asInstanceOf[JSONObject].obj ("senderIP").toString
+    val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
     val currentMatch: Option[Match] = getMatchFor(senderIP)
 
     println("Client match found !")
 
-    if(currentMatch.isDefined) {
+    if (currentMatch.isDefined) {
       currentMatch.get.addReadyPlayer(senderIP)
 
       println("Client startup completed !")
@@ -97,13 +97,20 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       }
     }
 
-  else {
-  println ("MEGAERROREENORME! un Client non connesso sta cercando di iniziare una partita")
-    //throw new MatchNotFoundException
-  }
+    else {
+      println("MEGAERROREENORME! un Client non connesso sta cercando di iniziare una partita")
+      //throw new MatchNotFoundException
+    }
 
 
   }
+
+    case "updateMatch" =>{
+      val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
+      val m = getMatchFor(currentMatch.involvedPlayer.headOption.get)
+
+      m.get.involvedPlayer = currentMatch.involvedPlayer
+    }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
@@ -130,32 +137,6 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       }
     }
     Option.empty[Match]
-  }
-
-  private def getMatch(id:Int): Option[Match] = {
-
-    val waiting: Option[Match] = waitingMatch.find((x) => x.id == id)
-
-    val started: Option[Match] = startedMatch.find((x) => x.id == id)
-
-    if ( waiting.isDefined) {
-      return waiting
-    }
-
-    else if (started.isDefined){
-      return started
-    }
-
-    Option.empty[Match]
-  }
-
-  private def getWaitingMatch: List[Match] = {
-    waitingMatch
-  }
-
-  private def startMatch( selected: Match): Unit = {
-    waitingMatch = waitingMatch.filter((x) => x != selected)
-    startedMatch = startedMatch ::: List(selected)
   }
 
 

@@ -164,7 +164,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       if (response) {
         val currentMatch: Match = getMatchFor(friendIP).get
         currentMatch.addPlayer(senderIP)
-        //todo: aggiorna anche la lista dall'altra parte
+
+        context.actorSelection("user/matchMaster/gameConfigurationManager") ! JSONObject(Map[String, Any](
+          "object" -> "updateMatch",
+          "match" -> currentMatch ))
 
         val reply: JSONObject = JSONObject(Map[String, Any](
           "object" -> "friendResponse",
@@ -173,7 +176,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
         sendRemoteMessage(friendIP, reply)
       }
-        
+
       else {
         val reply: JSONObject = JSONObject(Map[String, Any](
           "object" -> "friendResponse",
