@@ -22,11 +22,10 @@ object DatabaseQuery {
   def allMatches(username: String): List[MatchResult] = {
     var allMatches: List[MatchResult] = List.empty
     try {
-      val statement = connection.createStatement()
       val query = "SELECT result, date, score FROM gamematch WHERE userId = ?"
-      val pstmt = connection.prepareStatement(query)
-      pstmt.setString(1, username)
-      val resultSet = pstmt.executeQuery()
+      val statement = connection.prepareStatement(query)
+      statement.setString(1, username)
+      val resultSet = statement.executeQuery()
 
       while (resultSet.next()) {
         val userMatch = new MatchResultImpl()
@@ -58,14 +57,13 @@ object DatabaseQuery {
     */
   def addUser(name: String, username: String, email: String, password: String): Boolean ={
     try {
-      val statement = connection.createStatement()
       val query = "INSERT INTO user " + "VALUES (?,?,?,?)"
-      val pstmt = connection.prepareStatement(query)
-      pstmt.setString(1, username)
-      pstmt.setString(2, name)
-      pstmt.setString(3, email)
-      pstmt.setString(4, password)
-      pstmt.execute()
+      val statement = connection.prepareStatement(query)
+      statement.setString(1, username)
+      statement.setString(2, name)
+      statement.setString(3, email)
+      statement.setString(4, password)
+      statement.execute()
     }catch{
       case e =>println("username is not valid.")
         return false
@@ -87,11 +85,10 @@ object DatabaseQuery {
     */
   def checkLogin(username: String, password: String): String ={
     try {
-      val statement = connection.createStatement()
       val query = "SELECT username, password FROM user WHERE username = ?"
-      val pstmt = connection.prepareStatement(query)
-      pstmt.setString(1, username)
-      val resultSet = pstmt.executeQuery()
+      val statement = connection.prepareStatement(query)
+      statement.setString(1, username)
+      val resultSet = statement.executeQuery()
       while (resultSet.next()) {
         val username = resultSet.getString("username")
         val psw = resultSet.getString("password")
@@ -121,16 +118,15 @@ object DatabaseQuery {
     */
   def addMatchResult(username: String, matchResult: MatchResult): Boolean ={
     try {
-      val statement = connection.createStatement()
       val query = "INSERT INTO gamematch " + "VALUES (?,?,?,?,?)"
-      val pstmt = connection.prepareStatement(query)
+      val statement = connection.prepareStatement(query)
       println("prepar")
-      pstmt.setNull(1, 1)
-      pstmt.setBoolean(2, matchResult.result)
-      pstmt.setDate(3,new java.sql.Date(matchResult.date.getTimeInMillis()) )
-      pstmt.setInt(4, matchResult.score)
-      pstmt.setString(5, username)
-      pstmt.execute()
+      statement.setNull(1, 1)
+      statement.setBoolean(2, matchResult.result)
+      statement.setDate(3,new java.sql.Date(matchResult.date.getTimeInMillis()) )
+      statement.setInt(4, matchResult.score)
+      statement.setString(5, username)
+      statement.execute()
     }catch{
       case e =>println("username is not valid.")
         return false
@@ -138,7 +134,7 @@ object DatabaseQuery {
     println("Match added.")
     true
   }
-  
+
   /**
     * Convert sql.Date to Calendar object.
     *
