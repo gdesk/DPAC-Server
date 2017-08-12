@@ -14,20 +14,20 @@ class Match (var involvedPlayer: List[String], val size: Range){
 
   var readyPlayer: Int = 0
 
-  def addPlayer (player: String): Boolean = {
+  def addPlayer (playerIP: String): Boolean = {
     var addedToMatch: Boolean = false
-    val list =  involvedPlayer.find((x) => x == player)
+    val list =  involvedPlayer.find((x) => x == playerIP)
 
     if(list.isEmpty) {
-      involvedPlayer = involvedPlayer ::: List(player)
+      involvedPlayer = involvedPlayer ::: List(playerIP)
       addedToMatch = true
     }
 
     addedToMatch
   }
 
-  def addReadyPlayer(player: String): Unit = {
-    if (involvedPlayer contains player) {
+  def addReadyPlayer(playerIP: String): Unit = {
+    if (involvedPlayer contains playerIP) {
       readyPlayer = readyPlayer + 1
       println("New ready player, " + (involvedPlayer.size - readyPlayer) + " left.")
     }

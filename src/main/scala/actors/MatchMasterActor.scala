@@ -27,6 +27,10 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "selectedRange" => gameManager ! message //ok
 
+    case "addFriend" => clientMessageDispatcher ! message
+
+    case "responseFriend" => clientMessageDispatcher ! message
+
     case "characterToChooseRequest" => characterManager ! message //ok
 
     case "chooseCharacter" => characterManager ! message  //ok

@@ -125,6 +125,65 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       onlineMatch = onlineMatch ::: List(currentMatch)
     }
 
+    case "addFriend" => {
+      val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
+      val senderUsername: String = message.asInstanceOf[JSONObject].obj("senderUsername").toString
+
+      println(s"$senderUsername ask $username for a match !")
+
+      val friend: Option[Client] = getClient(username)
+
+      if (friend.isDefined) {
+        val friendIP: String = friend.get.ip
+        val request: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "friendRequest",
+          "senderRequest" -> senderUsername,
+          "senderIP" -> senderIP))
+
+        sendRemoteMessage(friendIP, request)
+      }
+
+        // other client is not logged to this server (is offline)
+      else {
+        val request: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "friendResponse",
+          "responseRequest" -> false,
+          "motivation" -> "offline"))
+
+        sendRemoteMessage(senderIP, request)
+      }
+    }
+
+    case "responseFriend" => {
+      //the ip of the original sender of the request
+      val friendIP: String = message.asInstanceOf[JSONObject].obj("friendIP").toString
+      val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      val response: Boolean = message.asInstanceOf[JSONObject].obj("response").asInstanceOf[Boolean]
+
+      if (response) {
+        val currentMatch: Match = getMatchFor(friendIP).get
+        currentMatch.addPlayer(senderIP)
+        //todo: aggiorna anche la lista dall'altra parte
+
+        val reply: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "friendResponse",
+          "responseRequest" -> response,
+          "motivation" -> "accepted"))
+
+        sendRemoteMessage(friendIP, reply)
+      }
+        
+      else {
+        val reply: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "friendResponse",
+          "responseRequest" -> response,
+          "motivation" -> "refused"))
+
+        sendRemoteMessage(friendIP, reply)
+      }
+    }
+
     case "characterToChoose" => {
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
