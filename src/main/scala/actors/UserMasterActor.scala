@@ -45,12 +45,11 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
         case "success" => {
 
-          val client: Client = new ClientImpl(ip, username)
 
           //todo: manda al client message dispatcher
           clientMessageDispatcher ! JSONObject(Map[String, Any](
                     "object" -> "addOnlinePlayer",
-                    "player" -> client,
+                    "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
                     "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
           println(s"Player $username connected from $ip !" )

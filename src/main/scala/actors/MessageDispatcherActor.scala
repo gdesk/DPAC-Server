@@ -15,16 +15,17 @@ import scala.util.parsing.json.JSONObject
   * @author manuBottax
   */
 class MessageDispatcherActor extends UntypedAbstractActor {
-
-  //todo: Aggioranre come lista di client
-  var onlineClientIP: List[String] = List()
+  
+  var onlineClient: List[Client] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
     case "addOnlinePlayer" => {
-      val user: Client = message.asInstanceOf[JSONObject].obj("player").asInstanceOf[Client]
-      //val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      onlineClientIP = onlineClientIP ::: List (user.ip)
+      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+
+
+      onlineClient = onlineClient ::: List (new ClientImpl(ip, username))
     }
 
     case "registrationResult" => {
@@ -82,13 +83,27 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
+      val user: Option[Client] = getClient(username)
 
-      //todo: da gestire il logout
-      val reply: JSONObject = JSONObject(Map[String, Any](
-        "object" -> "logoutResponse",
-        "response" ->  true ))
+      if (user.isDefined) {
+        println(s"$username has logged out")
 
-      sendRemoteMessage(ip, reply)
+        val reply: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "logoutResponse",
+          "response" -> true))
+
+        sendRemoteMessage(ip, reply)
+      }
+
+      else {
+        System.err.println(s"Error: $username not logged to this server, cannot log out.")
+
+        val reply: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "logoutResponse",
+          "response" -> false))
+
+        sendRemoteMessage(ip, reply)
+      }
     }
 
     case "ranges" => {
@@ -210,25 +225,26 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   //todo: questo va fatto solo per la partita interessata
   private def broadcastMessage(message: JSONObject): Unit = {
 
-    println("broadcast message to " + onlineClientIP.size + " client")
-    //todo: da togliere
-    val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-    //
-    sendRemoteMessage(ip,message)
-    onlineClientIP.foreach((x) => sendRemoteMessage(x,message))
+    println("broadcast message to " + onlineClient.size + " client")
+    onlineClient.foreach((x) => sendRemoteMessage(x.ip,message))
   }
 
   //todo: questo va fatto solo per la partita interessata
   private def broadcastConfigurationMessage(message: JSONObject): Unit = {
-    onlineClientIP.foreach((x) => sendConfigurationMessage(x, message))
+    onlineClient.foreach((x) => sendConfigurationMessage(x.ip, message))
   }
 
   //todo: questo va fatto solo per la partita interessata
   //todo: mandare all'altro attore (quello che è un attore e non al solito) (FromServerCommunication)
   private def notifyOtherClient(excludedClient: String, message: Any): Unit =  {
-    onlineClientIP.foreach((x) => {
-      if (x != excludedClient) sendRemoteMessage(x,message)
+    onlineClient.foreach((x) => {
+      if (x.ip != excludedClient) sendRemoteMessage(x.ip,message)
     })
+  }
+
+
+  private def getClient(username: String): Option[Client] =  {
+    onlineClient.find((x) => x.username == username)
   }
 
 
