@@ -15,6 +15,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
+      // request to add a new user to the database
     case "addUserToDB" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -22,6 +23,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
       if( addUserToDB(user) ) {
 
+        println("User correctly added to database.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "registrationResult",
           "username" -> user.username,
@@ -31,15 +33,16 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
       else {
 
+        System.err.println("Error: User not added to the database.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "registrationResult",
           "username" -> user.username,
           "result" -> "fail",
           "senderIP" -> ip))
       }
-
     }
 
+      // request to check login information
     case "checkUsernameAndPassword" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -48,6 +51,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
       if( checkLoginInfo(username, password) ) {
 
+        println("User login info are correct.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "checkLoginInfoResult",
           "result" -> "success",
@@ -56,22 +60,19 @@ class DatabaseManagerActor extends UntypedAbstractActor {
       }
 
       else{
-
+        System.err.println("Error: Wrong login info.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "checkLoginInfoResult",
           "result" -> "fail",
           "username" -> username,
           "senderIP" -> ip))
       }
-
     }
 
-
+      // request for the previous match result for a player -> message received after the player login
     case "getPreviousMatchResult" => {
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val resultList: Option[List[Map[String, Any]]] = getMatchResultFor(username)
-
-      println(resultList)
 
       context.parent ! JSONObject(Map[String, Any](
                        "object" -> "previousMatchResult",
@@ -79,12 +80,13 @@ class DatabaseManagerActor extends UntypedAbstractActor {
                        "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
     }
 
+      // request for the previous match result for a player -> use the previous message handler
     case "allMatchResult" => self ! JSONObject(Map[String, Any](
           "object" -> "getPreviousMatchResult",
           "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
           "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
-      //todo: gestire match result con il model del client
+      // request to add a new match result for a player
     case "addResult" => {
       val user: User = message.asInstanceOf[JSONObject].obj("user").asInstanceOf[User]
       val result: MatchResult = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[MatchResult]

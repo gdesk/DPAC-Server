@@ -1,6 +1,6 @@
 package actors
 
-import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import akka.actor.UntypedAbstractActor
 import model.{ImmutableUser, User}
 import utils.ActorsUtils
 
@@ -15,39 +15,38 @@ class RegistrationManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
+      // a new user want to register from a remote client
     case "newUser" => {
 
       println("A new user want to register !")
 
+      //todo: andrebbe controllato che queste stringhe non siano vuote.
       val name: String = message.asInstanceOf[JSONObject].obj("name").toString
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val email: String = message.asInstanceOf[JSONObject].obj("email").toString
       val password: String = message.asInstanceOf[JSONObject].obj("password").toString
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
-
       val user: User = new ImmutableUser(name, username, password, email)
 
       pendingUser = pendingUser ::: List(user)
 
+        // send a request to the database manager for adding the new user.
       context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
         "object" -> "addUserToDB",
         "user" -> user,
         "senderIP" -> ip ))
     }
 
-
+      //handle the result from the database manager and notify it to the client
     case "registrationResult" => {
-
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val result: String = message.asInstanceOf[JSONObject].obj("result").toString
 
-
       val currentUser: Option[User] = pendingUser.find((x) => x.username == username)
 
       if (currentUser.isDefined) {
-
         pendingUser = pendingUser.filter( _ != currentUser.get)
         result match {
 
@@ -73,5 +72,4 @@ class RegistrationManagerActor extends UntypedAbstractActor {
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
-
 }
