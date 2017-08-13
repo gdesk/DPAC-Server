@@ -6,17 +6,13 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
   var characterManager: ActorRef = _
   var playgroundManager: ActorRef = _
-  var friendManager: ActorRef = _
   var gameManager: ActorRef = _
   var endGameManager: ActorRef = _
-
-  var clientManager: ActorRef = _
 
   override def preStart(): Unit = {
 
     characterManager = context.actorOf(Props[CharacterManagerActor], "characterManager")
     playgroundManager = context.actorOf(Props[PlaygroundManagerActor], "playgroundManager")
-    friendManager = context.actorOf(Props[FriendSearchManagerActor], "friendManager")
     gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
     endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
   }

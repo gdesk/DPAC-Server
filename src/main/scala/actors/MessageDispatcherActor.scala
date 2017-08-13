@@ -283,7 +283,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     val msgType: String = ActorsUtils.messageType(message)
 
-    println("Send message [ " + msgType + "]to : " + ipAddress)
+    println("Send message [ " + msgType + " ] to : " + ipAddress)
 
     //test locale
     //val clientActorName = "fakeReceiver"

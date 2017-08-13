@@ -21,7 +21,6 @@ class RegistrationManagerActor extends UntypedAbstractActor {
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val email: String = message.asInstanceOf[JSONObject].obj("email").toString
       val password: String = message.asInstanceOf[JSONObject].obj("password").toString
-      //val ip: String = ActorsUtils.parseIP(message.asInstanceOf[JSONObject].obj("senderIP").toString)
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
 
@@ -29,38 +28,12 @@ class RegistrationManagerActor extends UntypedAbstractActor {
 
       pendingUser = pendingUser ::: List(user)
 
-      context.actorSelection("../databaseManager") ! JSONObject( Map[String, String](
-                          "object" -> "checkUsername",
-                          "username" -> username,
-                          "senderIP" -> ip ))
+      context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
+        "object" -> "addUserToDB",
+        "user" -> user,
+        "senderIP" -> ip ))
     }
 
-    case "usernameCheckResult" => {
-
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
-      val result: String = message.asInstanceOf[JSONObject].obj("result").toString
-
-      val currentUser: Option[User] = pendingUser.find((x) => x.username == username)
-
-      if (currentUser.isDefined) {
-        result match {
-
-          case "success" => {
-
-            context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
-              "object" -> "addUserToDB",
-              "user" -> currentUser.get,
-              "senderIP" -> ip))
-          }
-
-          case _ => self ! JSONObject(Map[String, Any](
-              "object" -> "registrationResult",
-              "result" -> "failure",
-              "senderIP" -> ip))
-        }
-      }
-    }
 
     case "registrationResult" => {
 
@@ -95,8 +68,6 @@ class RegistrationManagerActor extends UntypedAbstractActor {
         }
       }
     }
-
-      //todo: solo lo username deve essere univoco e controllato ?
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }

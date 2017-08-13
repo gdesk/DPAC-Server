@@ -3,6 +3,7 @@ package actors
 import java.util.Calendar
 
 import akka.actor.UntypedAbstractActor
+import database.DatabaseQuery
 import model.{MatchResult, MatchResultImpl, User}
 
 import scala.util.parsing.json.JSONObject
@@ -16,30 +17,6 @@ class DatabaseManagerActor extends UntypedAbstractActor {
   //todo: questo attore interagisce con il db e mi restituisce informazioni sugli utenti => probabilmente servirà un parametro
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
-
-    case "checkUsername" => {
-
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
-
-      if (  checkAvailableUsername(username) ) {
-
-        sender() ! JSONObject(Map[String, String](
-          "object" -> "usernameCheckResult",
-          "username" -> username,
-          "result" -> "success",
-          "senderIP" -> ip))
-      }
-
-      else {
-
-        sender() ! JSONObject(Map[String, String](
-          "object" -> "usernameCheckResult",
-          "username" -> username,
-          "result" -> "fail",
-          "senderIP" -> ip))
-      }
-    }
 
     case "addUserToDB" => {
 
@@ -129,11 +106,10 @@ class DatabaseManagerActor extends UntypedAbstractActor {
   //todo
   private def getMatchResultFor(username: String): Option[List[Map[String, Any]]] = Option(List(Map ("result" -> true,"score" -> 42, "date" -> Calendar.getInstance())))
 
-  //todo non serve perchè lo fa già in automatico con add
-  private def checkAvailableUsername(username: String): Boolean = true
-
-  //todo
-  private def addUserToDB(user: User): Boolean = true
+  // todo: da testare
+  private def addUserToDB(user: User): Boolean = {
+    DatabaseQuery.addUser(user.name,user.username,user.mail,user.password)
+  }
 
   //Todo
   private def checkLoginInfo(username: String, password: String): Boolean = true
