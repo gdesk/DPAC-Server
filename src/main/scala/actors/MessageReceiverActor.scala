@@ -14,12 +14,15 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
   var userMaster: ActorRef = _
   var matchMaster: ActorRef = _
 
+  /** Start the main Actors that handle user-related message and match-related message */
   override def preStart(): Unit = {
-
     userMaster = context.actorOf(UserMasterActor.props(messageDispatcher), "userMaster")
-    matchMaster = context.actorOf(MatchMasterActor.props(messageDispatcher), "matchMaster")
-    super.preStart()
+    println("userMaster actor created")
 
+    matchMaster = context.actorOf(MatchMasterActor.props(messageDispatcher), "matchMaster")
+    println("matchMaster actor created")
+
+    super.preStart()
   }
 
   override def onReceive(message: Any): Unit = {
@@ -28,50 +31,62 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
     ActorsUtils.messageType(message) match {
 
-      case "newUser" => userMaster ! message //ok
+        // message received from client when a new user want to register
+      case "newUser" => userMaster ! message
 
-      case "login" => userMaster ! message // ok
+        // message received from client when a user want to log in
+      case "login" => userMaster ! message
 
-      case "logout" => userMaster ! message // ok
+        // message received from client when a user want to log out
+      case "logout" => userMaster ! message
 
-      case "allMatchResult" => userMaster ! message // ok
+        // message received from client when a user want to receive his previous match result
+      case "allMatchResult" => userMaster ! message // non usato
 
+        // message received from client when a user want to receive the list of available range
       case "rangesRequest" => matchMaster ! message //ok
 
+        // message received from client when a range is selected. this also add the user to a match
       case "selectedRange" => matchMaster ! message // ok
 
-      // todo: mancano messaggi per amici -> vedi foglio
+        // message received from client when a user want to add a friend to a match
+        //todo: è da testare
       case "addFriend" => matchMaster ! message
 
+        // message received from client as response to a friend request
+        //todo: è da testare
       case "responseFriend" => matchMaster ! message
 
+        // message received from client when a user want to receive the list of available character
       case "characterToChooseRequest" => matchMaster ! message //ok
 
+        // message received from client when a character is selected -> check for availability and assign it
+        // todo: non mi ricordo più se notifico la scelta o no.
       case "chooseCharacter" => matchMaster ! message // ok
 
-      // todo: da testare
+        // message received from client when a user want to receive the list of all the character for current match
+        // todo: da testare
       case "teamCharacterRequest" => matchMaster ! message
 
+        // message received from client when a user want to receive the list of image of available playground
       case "playgrounds" => matchMaster ! message // ok
 
+        // message received from client when a playground is selected -> check for availability and assign it
       case "chosenPlayground" => matchMaster ! message // ok
 
-      /// PeerBootstrap
+        // message received from client when all configuration are completed and the peer need to start
+      case "startGame" => matchMaster ! message
 
-      case "startGame" => {
-        println("startGame message received !")
-        matchMaster ! message
-      } //
+        // message received from client when the peer startup is completed and can start -> when all are ready notify all for match start
+      case "serverIsRunning" => matchMaster ! message
 
-      case "serverIsRunning" => matchMaster ! message //
-
-      case "matchResult" => matchMaster ! message //
+        // message received from client when the match end -> used to save the result into the database
+      case "matchResult" => matchMaster ! message
 
       case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
+        
     }
-
   }
-
 }
 
 object MessageReceiverActor {
