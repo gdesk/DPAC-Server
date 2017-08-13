@@ -1,20 +1,18 @@
 package actors
 
-import akka.actor.{ActorSelection, Props, UntypedAbstractActor}
+import akka.actor.UntypedAbstractActor
 import model.Match
 import utils.ActorsUtils
-
 import scala.util.parsing.json.JSONObject
 
 /** Actor that manage the people waitnig for a match and the initial configuration of the game.
   *
-  *  @author manuBottax
+  * @author manuBottax
   */
 class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   private def MIN_PLAYER(v: Int): Int = 3 + 2 * v
   private def MAX_PLAYER(v: Int): Int = 5 + 2 * v
-
 
   //todo: controllare se sono i range giusti
   private val availableRange: List[Range] = List( Range(MIN_PLAYER(0), MAX_PLAYER(0)),  // 3 - 5
@@ -23,18 +21,11 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   private var waitingMatch: List[Match] = List()
 
-
-
-
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
     case "rangesRequest" => {
 
-      //todo: Controllare quali sono i valori dei range nel client
-
       println("Request for the available ranges")
-
-      //availableRange = getAvailableRanges
 
       sender() ! JSONObject(Map[String, Any](
         "object" -> "ranges",
@@ -43,7 +34,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     }
 
-      //todo: controllare se fuzniona la creazione di una nuova quando non lo trova
+      //todo: da testare: controllare se fuzniona la creazione di una nuova quando non lo trova
     case "selectedRange" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -71,10 +62,9 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       else {
         println("No Available Match for this range, create a new One")
       }
-
     }
 
-
+    // the message sent from client when configuring the P2P communication.
   case "serverIsRunning" => {
 
     val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -85,26 +75,23 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       println("Client match found !")
       currentMatch.get.addReadyPlayer(senderIP)
 
-      println("Client startup completed !")
+      println("Client P2P startup completed !")
 
       if (currentMatch.get canStart) {
-        println("Client startup completed, can start !")
+        println("All Clients P2P startup completed, game can start !")
         sender() ! JSONObject(Map[String, Any](
           "object" -> "clientCanConnect",
           "senderIP" -> senderIP
         ))
-
       }
     }
 
     else {
-      println("MEGAERROREENORME! un Client non connesso sta cercando di iniziare una partita")
-      //throw new MatchNotFoundException
+      System.err.println("Error ! non connencted client want to start a game ! ")
     }
-
-
   }
 
+      // received when a friend accept a friend request
     case "updateMatch" =>{
       val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
       val m = getMatchFor(currentMatch.involvedPlayer.headOption.get)
@@ -138,9 +125,6 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
     }
     Option.empty[Match]
   }
-
-
-
 }
 
 

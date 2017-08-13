@@ -1,15 +1,12 @@
 package actors
 
-
 import java.io.File
-
 import akka.actor.UntypedAbstractActor
 import utils.{ActorsUtils, Direction}
 import model.Character
-
 import scala.util.parsing.json.JSONObject
 
-/** Actor that manage the choice of a character for the match.
+/** Actor that manage the choice of characters for the match.
   *
   *  @author manuBottax
   */
@@ -23,9 +20,10 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
+      // request for the list of available characters.
     case "characterToChooseRequest"  => {
 
-      println("Request for the available character")
+      println("Request for the available characters")
 
       println("Now available: " + availableCharacter.size)
 
@@ -40,7 +38,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
                 "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
     }
 
-      //dico al client se è disponibile e a tutti gli altri dico che è stato scelto
+      //tell the client if the character chosen is available. if it is, it is assigned to the client and other client for the match are notified.
     case "chooseCharacter" => {
 
       val characterID: String = message.asInstanceOf[JSONObject].obj("character").toString
@@ -59,6 +57,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
                     "available" -> true ,
                     "map" -> character,
                     "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "notifySelection",
                     "character" -> characterID,
@@ -73,10 +72,10 @@ class CharacterManagerActor extends UntypedAbstractActor {
       }
     }
 
-
+      // request for the data of other character choesn for the match
     case "teamCharacterRequest" => {
 
-      println(s"Request data for all the match character")
+      println("Request data for all the match characters")
 
       var characterList: Map[String, Map[String, Array[Byte]]] = Map()
 
@@ -85,7 +84,6 @@ class CharacterManagerActor extends UntypedAbstractActor {
       var associationMap: Map[String, Array[String]] = Map()
 
       selectedCharacter.foreach((x) => associationMap += (x.ownerIP -> Array(x.getType, x.name)) )
-
 
         sender() ! JSONObject(Map[String, Any](
           "object" -> "characterChosen",
@@ -104,31 +102,28 @@ class CharacterManagerActor extends UntypedAbstractActor {
   //todo: Questa lista in un futuro aggiornamento cambierà da utente a utente a seconda di cosa ha sbloccato un giocatore
   private def getPlayableCharacters: List[Character] = {
 
+    //todo: andrà letta da qualche parte la lista dei disponibili, a livello di model, non così....
 
-    //TODO: Andrà letta dal database ????
-
+    //load all the character resources file:
     var charResList: List[Character] = List()
-
     val pacman: Character = new Character("pacman")
 
     var basePath: String = "src/main/resources/characters/"
 
-
-    //todo: leggere i file.......
     for( x <- Direction.values()){
 
-      var path24: String = pacman.name.toLowerCase +"/24x24"
+      val path24: String = pacman.name.toLowerCase +"/24x24"
       val f: File = new File(basePath + path24 + "/" + x.getDirection + ".png")
       println(f.length())
       pacman.addImage(f)
 
-      var path32: String = pacman.name.toLowerCase +"/32x32"
+      val path32: String = pacman.name.toLowerCase +"/32x32"
       pacman.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
-      var path48: String = pacman.name.toLowerCase +"/48x48"
+      val path48: String = pacman.name.toLowerCase +"/48x48"
       pacman.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
-      var path128: String = pacman.name.toLowerCase +"/128x128"
+      val path128: String = pacman.name.toLowerCase +"/128x128"
       pacman.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
     }
 
@@ -163,6 +158,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     if (character.isDefined){
       availableCharacter = availableCharacter.filterNot((x) => x.name == characterID)
+      // assign the character to the player that has choose it.
       character.get.ownerIP = ownerIP
       return true
     }
@@ -181,11 +177,11 @@ class CharacterManagerActor extends UntypedAbstractActor {
     val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
 
     if(character.isDefined){
-
-      return character.get.imageList
+      character.get.imageList
     }
-
-    Map()
+    else {
+      Map()
+    }
   }
 
   private def cleanCharacterManager(): Unit = {
