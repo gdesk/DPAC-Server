@@ -5,8 +5,9 @@ import java.io.File
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 
-/**
-  * Created by Manuel Bottax on 26/07/2017.
+/** Fake actor system for server testing on local machine.
+  *
+  * @author manuBottax.
   */
 object FakeReceiverMain {
 
