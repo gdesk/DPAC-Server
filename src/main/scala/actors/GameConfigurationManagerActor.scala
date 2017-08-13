@@ -17,9 +17,9 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
 
   //todo: controllare se sono i range giusti
-  private val availableRange: List[Range] = List( Range(3, 5),  // 3 - 5
-                                                  Range(6, 9))  // 5 - 7
-                                                  //Range(10, 15))  // 7 - 9
+  private val availableRange: List[Range] = List( Range(MIN_PLAYER(0), MAX_PLAYER(0)),  // 3 - 5
+                                                  Range(MIN_PLAYER(1), MAX_PLAYER(1)),  // 5 - 7
+                                                  Range(MIN_PLAYER(2), MAX_PLAYER(2)))  // 7 - 9
 
   private var waitingMatch: List[Match] = List()
 

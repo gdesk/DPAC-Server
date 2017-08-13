@@ -84,7 +84,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
       case "matchResult" => matchMaster ! message
 
       case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
-        
+
     }
   }
 }
