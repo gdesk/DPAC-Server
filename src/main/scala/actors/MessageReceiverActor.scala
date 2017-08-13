@@ -5,7 +5,7 @@ import utils.ActorsUtils
 
 import scala.util.parsing.json.JSONObject
 
-/** Actor that receive message from the net, parse it and send appropriate message to the actor in the server.
+/** Actor that receive message from the remote client, parse it and send appropriate message to the actors in the server.
   *
   * @author manuBottax
   */

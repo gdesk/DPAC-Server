@@ -49,9 +49,7 @@ object Main {
     println()
 
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor] , "messageDispatcher")
-    println("messageDispatcher actor created.")
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
-    println("messageReceiver actor created.")
 
 
     /*

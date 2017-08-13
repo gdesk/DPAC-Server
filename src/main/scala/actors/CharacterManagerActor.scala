@@ -31,6 +31,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
       var retList: Map[String,File] = Map()
 
+      //todo: è da testare se va o se bisogna fare un array[byte] come dalle altre parti, o se farlo per uniformità
       availableCharacter.foreach( (x) => retList += ((x.name, x.characterImage)) )
 
       sender() ! JSONObject(Map[String, Any](

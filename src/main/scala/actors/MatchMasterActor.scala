@@ -3,6 +3,11 @@ package actors
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import utils.ActorsUtils
 
+/** An actor that handle the match-related message and dispatch it to the various actor.
+  * It also initialize the match-related actors.
+  *
+  * @author manuBottax
+  */
 class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor {
 
   var characterManager: ActorRef = _
@@ -20,58 +25,51 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    case "rangesRequest" => gameManager ! message //ok
+    case "rangesRequest" => gameManager ! message
 
-    case "selectedRange" => gameManager ! message //ok
+    case "selectedRange" => gameManager ! message
 
     case "addFriend" => clientMessageDispatcher ! message
 
     case "responseFriend" => clientMessageDispatcher ! message
 
-    case "characterToChooseRequest" => characterManager ! message //ok
+    case "characterToChooseRequest" => characterManager ! message
 
-    case "chooseCharacter" => characterManager ! message  //ok
+    case "chooseCharacter" => characterManager ! message
 
     case "teamCharacterRequest" => characterManager ! message
 
-    case "playgrounds" => playgroundManager ! message //da completare
+    case "playgrounds" => playgroundManager ! message
 
-    case "chosenPlayground" => playgroundManager ! message  //ok
+    case "chosenPlayground" => playgroundManager ! message
 
-    case "matchResult" => endGameManager ! message  //ok
+    case "matchResult" => endGameManager ! message
 
-    /// PeerBootstrap
-    case "startGame" => gameManager ! message //ok
-    ///// PeerBootstrap
-    case "serverIsRunning" => gameManager ! message //ok
+    case "startGame" => gameManager ! message
 
-
-    //case "startGame" => peerBootstrapManager ! message
+    case "serverIsRunning" => gameManager ! message
 
     ////// LOCAL MESSAGE HANDLER ////////////////////
 
-
-    case "ranges" => clientMessageDispatcher ! message  //ok
+    case "ranges" => clientMessageDispatcher ! message
 
     case "newPlayerInMatch" => clientMessageDispatcher ! message
 
-    case "characterToChoose" => clientMessageDispatcher ! message //ok
+    case "characterToChoose" => clientMessageDispatcher ! message
 
-    case "availableCharacter" => clientMessageDispatcher ! message  //ok
+    case "availableCharacter" => clientMessageDispatcher ! message
 
-    case "notifySelection" => clientMessageDispatcher ! message //ok
+    case "notifySelection" => clientMessageDispatcher ! message
 
-    case "characterChosen" => clientMessageDispatcher ! message //
+    case "characterChosen" => clientMessageDispatcher ! message
 
-    case "AvailablePlaygrounds" => clientMessageDispatcher ! message  //ok
+    case "AvailablePlaygrounds" => clientMessageDispatcher ! message
 
-    case "playgroundChosen" => clientMessageDispatcher ! message  //ok
+    case "playgroundChosen" => clientMessageDispatcher ! message
 
-    case "otherPlayerIP" => clientMessageDispatcher ! message //ok
+    case "otherPlayerIP" => clientMessageDispatcher ! message
 
-    // case "resultSaved" => clientMessageDispatcher ! message
-
-    case "clientCanConnect" => clientMessageDispatcher ! message  //ok
+    case "clientCanConnect" => clientMessageDispatcher ! message
 
     case "previousMatchResult" => clientMessageDispatcher ! message
 

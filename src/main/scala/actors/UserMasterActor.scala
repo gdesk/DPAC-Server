@@ -1,24 +1,28 @@
 package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
-import model.{Client, ClientImpl}
 import utils.ActorsUtils
 
 import scala.util.parsing.json.JSONObject
 
+/** An actor that handle the user-related message and dispatch it to the various actor.
+  * It also initialize the user-related actors.
+  *
+  * @param clientMessageDispatcher: a reference to the actor that dispatch message to the remote client.
+  *
+  * @author manuBottax
+  */
 class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor{
 
   var databaseManager: ActorRef = _
   var loginManager: ActorRef = _
   var registrationManager: ActorRef = _
-  //var clientManager: ActorRef = _
 
   override def preStart(): Unit = {
 
     databaseManager = context.actorOf(Props[DatabaseManagerActor] , "databaseManager")
     loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
     registrationManager = context.actorOf(Props[RegistrationManagerActor] , "registrationManager")
-    //clientManager = context.actorOf(Props[ClientManagerActor], "clientManager")
 
     super.preStart()
   }
@@ -37,6 +41,7 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
     case "registrationResult" => clientMessageDispatcher ! message
 
+      // login result handler
     case "loginResult" => {
       val result: String = message.asInstanceOf[JSONObject].obj("result").toString
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
@@ -68,15 +73,10 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
       }
     }
 
-      ////////// /////////////////////
-
     case "previousMatchResult" => clientMessageDispatcher ! message
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
-
-
   }
-
 }
 
 object UserMasterActor {
@@ -88,5 +88,4 @@ object UserMasterActor {
     * @return a Props for creating this actor.
     */
   def props(clientMessageDispatcher: ActorRef): Props = Props(new UserMasterActor(clientMessageDispatcher))
-
 }
