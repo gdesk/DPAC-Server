@@ -1,4 +1,5 @@
-import actors.ActorsUtils
+package test
+
 import akka.actor.UntypedAbstractActor
 
 import scala.util.parsing.json.JSONObject

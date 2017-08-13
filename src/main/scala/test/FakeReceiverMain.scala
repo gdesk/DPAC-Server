@@ -1,6 +1,7 @@
+package test
+
 import java.io.File
 
-import actors.MessageDispatcherActor
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 

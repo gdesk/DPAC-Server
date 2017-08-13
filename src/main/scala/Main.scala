@@ -1,22 +1,31 @@
-import java.io.File
+
 import java.net.InetAddress
 
 import actors.{ActorsUtils, MessageDispatcherActor, MessageReceiverActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
-import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
+import com.typesafe.config.ConfigFactory
 
-import scala.util.parsing.json.JSONObject
-
-/**
-  * Created by Manuel Bottax on 15/07/2017.
+/** The main class for the server application.
+  * It configure the server and start actors system.
+  *
+  * @author manuBottax
   */
 object Main {
 
   def main(args: Array[String]): Unit = {
 
-    //val config = ConfigFactory.parseFile(new File("src/dpacServer.conf"))
+    println("[ DPACS - Distributed Pacman Server ]")
+    println("[ Version 1.0.0 - August 2017 ]")
+    println()
+    println("[ Project for Software System Development course @ Unibo - Ingegneria e Scienze Informatiche - A.Y. 2016/17 ]")
+    println("[ Developed by Manuel Bottazzi, Giulia Lucchi, Federica Pecci, Margherita Pecorelli & Chiara Varini ]")
+    println()
+
+    println("-- Server configuration and startup --")
+    println()
+
     val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
-    println("myIp: " + myIP)
+    println("my IP: " + myIP)
 
     val config = ConfigFactory.parseString(
       " akka { \n" +
@@ -34,8 +43,14 @@ object Main {
 
     val system = ActorSystem.create("DpacServer", config)
 
+    println()
+    println("-- Actors Creation --")
+    println()
+
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor] , "messageDispatcher")
+    println("messageDispatcher actor created.")
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
+    println("messageReceiver actor created.")
 
 
     /*
