@@ -274,6 +274,20 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       broadcastConfigurationMessage(ip, reply)
     }
 
+      /////LOCAL UTILITY HANDLER ////
+
+    case "getMatchSize" => {
+      val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+
+      val currentMatch: Option[Match] = getMatchFor(senderIP)
+
+      if(currentMatch.isDefined){
+        sender() ! JSONObject(Map[String, Any](
+          "object" -> "matchSize",
+          "matchSize" -> currentMatch.get.involvedPlayer.size ))
+      }
+    }
+
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 

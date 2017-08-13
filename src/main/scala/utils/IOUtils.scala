@@ -68,9 +68,6 @@ object IOUtils {
       val block: List[Block] = parseBlock(file)
       val eatable: List[Eatable] = parseEatable(file)
 
-      // todo: perchè character vuole i tipi ?
-      //val character: List[Character[Int,Int]] = parseCharacter(playgroundFile)
-
       playground.dimension = parseDimension(file)
       var groundList: List[GameItem] = block ::: eatable
       playground.ground_=(groundList)

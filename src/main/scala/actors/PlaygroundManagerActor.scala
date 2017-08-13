@@ -49,11 +49,19 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
     case "chosenPlayground" => {
       val vote: Int = message.asInstanceOf[JSONObject].obj("playground").asInstanceOf[Int]
-      val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val matchSize: Int = getMatchSize(senderIP)//message.asInstanceOf[JSONObject].obj("playersNumber").asInstanceOf[Int]
 
       votedPlayground(vote) = votedPlayground(vote) + 1
       currentVoteCount = currentVoteCount + 1
+
+      context.actorSelection("user/messageDispatcher") ! JSONObject(Map[String, Any](
+        "object" -> "getMatchSize",
+        "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
+
+    }
+
+    case "matchSize" => {
+
+      val matchSize: Int = message.asInstanceOf[JSONObject].obj("matchSize").asInstanceOf[Int]
 
       if (currentVoteCount == matchSize){
         println("Selected Playground !")
@@ -67,6 +75,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
         //votedPlayground = new ListBuffer
         currentVoteCount = 0
       }
+
       else
         println("Waiting for other votes: " + (matchSize - currentVoteCount) + " votes left.")
     }
@@ -74,10 +83,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
-  //todo: andranno presi dal DB
   private def getAvailablePlayground: List[File] = {
-
-    //todo: guarda se c'è modo per aprire tuti i file in una cartella
 
     var fileList: List[File] = List()
 
@@ -86,7 +92,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
     for (file <- listOfFiles) {
       if (file.isFile) {
-        println(file.getName)
+        //println(file.getName)
         fileList = fileList ::: List (file)
       }
     }
@@ -100,8 +106,5 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
     //TODO: gestire i pareggi
     availablePlayground(selected)
   }
-
-  //todo:
-  private def getMatchSize(senderIP: String): Int = 2
 
 }

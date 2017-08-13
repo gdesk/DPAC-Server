@@ -11,11 +11,4 @@ trait Client {
 
 }
 
-class ClientImpl (val ip: String, val username: String) extends Client {
-
-  //TODO
-  def getUser: User ={
-    //DBManager.getUser(username)
-    null
-  }
-}
+class ClientImpl (val ip: String, val username: String) extends Client
