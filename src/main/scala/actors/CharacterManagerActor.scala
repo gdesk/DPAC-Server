@@ -1,11 +1,10 @@
 package actors
 
-import java.awt.Image
-import java.awt.image.BufferedImage
-import java.io.{File, FileOutputStream}
+
+import java.io.File
 
 import akka.actor.UntypedAbstractActor
-import utils.{Direction, Utils}
+import utils.Direction
 import model.Character
 
 import scala.util.parsing.json.JSONObject

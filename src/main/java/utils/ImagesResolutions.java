@@ -1,4 +1,4 @@
-package view.view.utils;
+package utils;
 
 /**
  * Enumeration forn different resolution game images.

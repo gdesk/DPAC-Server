@@ -1,13 +1,12 @@
 package utils
 
-import java.awt.{Color, Container, Image, Toolkit}
+import java.awt.{Image, Toolkit}
 import java.io.File
 import java.net.URL
-import javax.swing.{ImageIcon, JComponent, JFrame, JPanel}
+import javax.swing.{ImageIcon, JFrame, JPanel}
 
 import actors.ActorsUtils
 import clientModel.model.{MicroMapPanel, Playground}
-import view.view.utils.ImagesResolutions
 
 /**
   * Created by chiaravarini on 01/07/17.
