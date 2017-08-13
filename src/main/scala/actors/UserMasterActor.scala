@@ -45,8 +45,6 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
         case "success" => {
 
-
-          //todo: manda al client message dispatcher
           clientMessageDispatcher ! JSONObject(Map[String, Any](
                     "object" -> "addOnlinePlayer",
                     "username" -> message.asInstanceOf[JSONObject].obj("username").toString,

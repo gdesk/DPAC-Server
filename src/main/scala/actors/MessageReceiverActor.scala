@@ -2,6 +2,8 @@ package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 
+import scala.util.parsing.json.JSONObject
+
 /** Actor that receive message from the net, parse it and send appropriate message to the actor in the server.
   *
   * @author manuBottax
@@ -21,7 +23,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
   override def onReceive(message: Any): Unit = {
 
-    println("Received a new message !")
+    println("Received a new message [ " + message.asInstanceOf[JSONObject].obj("object")  + " ] !")
 
     ActorsUtils.messageType(message) match {
 

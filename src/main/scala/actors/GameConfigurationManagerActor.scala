@@ -80,9 +80,8 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     val currentMatch: Option[Match] = getMatchFor(senderIP)
 
-    println("Client match found !")
-
     if (currentMatch.isDefined) {
+      println("Client match found !")
       currentMatch.get.addReadyPlayer(senderIP)
 
       println("Client startup completed !")

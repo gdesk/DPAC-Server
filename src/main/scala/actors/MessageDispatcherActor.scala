@@ -55,13 +55,13 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     }
 
     case "loginError" => {
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIp").toString
+      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println("Login has failed ")
 
       val reply: JSONObject = JSONObject(Map[String, Any](
         "object" -> "matches",
-        "list" -> Option.empty[List[MatchResult]]))
+        "list" -> None))
 
       sendRemoteMessage(ip, reply)
     }
@@ -125,7 +125,18 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
 
       onlineMatch = onlineMatch ::: List(currentMatch)
+
+
+      currentMatch.involvedPlayer.foreach((x) => {
+
+        val reply: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "playerInMatch" ))
+
+        sendNotificationMessage(x,reply)
+      })
+
     }
+
 
     case "addFriend" => {
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString

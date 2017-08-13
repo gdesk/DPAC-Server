@@ -40,11 +40,10 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
 
       println("Found " + playgroundImages.size + "images")
 
-
       sender() ! JSONObject(Map[String, Any](
-                "object" -> "AvailablePlaygrounds",
-                "list" -> playgroundImages ,
-                "senderIP" -> senderIP))
+                 "object" -> "AvailablePlaygrounds",
+                 "list" -> playgroundImages ,
+                 "senderIP" -> senderIP))
     }
 
     case "chosenPlayground" => {

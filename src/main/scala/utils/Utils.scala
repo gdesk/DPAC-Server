@@ -1,13 +1,12 @@
 package utils
 
-import java.awt.{Color, Image, Toolkit}
+import java.awt.{Color, Container, Image, Toolkit}
 import java.io.File
 import java.net.URL
-import javax.swing.{ImageIcon, JComponent, JFrame}
+import javax.swing.{ImageIcon, JComponent, JFrame, JPanel}
 
 import actors.ActorsUtils
-import clientModel.model.Playground
-import view.view.playground.{PlaygroundBuilderImpl, PlaygroundPanel, PlaygroundSettings, PlaygroundView}
+import clientModel.model.{MicroMapPanel, Playground}
 import view.view.utils.ImagesResolutions
 
 /**
@@ -59,17 +58,15 @@ object Utils {
 
     val playground: Playground = IOUtils.getPlaygroundFromFile(playgroundFile)
 
-    val view: PlaygroundPanel = new PlaygroundPanel(new PlaygroundSettings(70,30))
 
-    view.renderBlockList(Utils.getJavaList(playground.blocks))
-    view.renderEatableList(Utils.getJavaList(playground.eatables))
+    val view: MicroMapPanel = new MicroMapPanel(playground)
 
     val f: JFrame = new JFrame("test")
-    f.setSize(1024,1024)
-    f.add(view, 0)
+    f.setSize(512,512)
+    f.setContentPane(view)
     f.setVisible(true)
 
-    saveComponentAsJPEG(view, "" + playgroundFile.getName + ".jpg" )
+    saveComponentAsJPEG(view, "" + playgroundFile.getName + ".jpg")
 
     val playgroundImage: Image = new ImageIcon("playgroundImages/" + playgroundFile.getName + ".jpg").getImage
 
@@ -77,7 +74,7 @@ object Utils {
 
   }
 
-  private def saveComponentAsJPEG(myComponent: JComponent, filename: String): Unit = {
+  private def saveComponentAsJPEG(myComponent: JPanel, filename: String): Unit = {
 
   import java.awt.image.BufferedImage
   import java.io.FileOutputStream
@@ -87,11 +84,10 @@ object Utils {
 
     val size = myComponent.getSize()
 
-    if(myComponent == null ) println("ERROEREOROROOER")
-    println("ok")
-    val myImage = new BufferedImage(size.width,size.height, BufferedImage.TYPE_INT_RGB)
+    val myImage = new BufferedImage(size.getWidth.toInt,size.getHeight.toInt, BufferedImage.TYPE_INT_RGB) //myComponent.createImage(512,512)//
     val g2 = myImage.createGraphics
     myComponent.paint(g2)
+
     try {
       val out = new FileOutputStream(filename)
       val encoder = JPEGCodec.createJPEGEncoder(out)
