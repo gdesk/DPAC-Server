@@ -1,6 +1,7 @@
 package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import utils.ActorsUtils
 
 class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor {
 

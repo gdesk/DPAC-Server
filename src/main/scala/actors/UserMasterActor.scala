@@ -2,6 +2,7 @@ package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import model.{Client, ClientImpl}
+import utils.ActorsUtils
 
 import scala.util.parsing.json.JSONObject
 

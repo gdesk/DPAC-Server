@@ -4,7 +4,7 @@ import java.awt.Image
 import java.io.File
 
 import akka.actor.UntypedAbstractActor
-import utils.Utils
+import utils.{ActorsUtils, Utils}
 
 import scala.collection.mutable.ListBuffer
 import scala.util.parsing.json.JSONObject
@@ -33,7 +33,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
       var i: Int = 0
 
       for( x <- availablePlayground ){
-        playgroundImages += (i -> Utils.getImageForPlayground(x))
+        playgroundImages += (i -> Utils.getByteArrayFromPlayground(x))
         votedPlayground += i
         i = i + 1
       }

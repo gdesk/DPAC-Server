@@ -4,7 +4,7 @@ package actors
 import java.io.File
 
 import akka.actor.UntypedAbstractActor
-import utils.Direction
+import utils.{ActorsUtils, Direction}
 import model.Character
 
 import scala.util.parsing.json.JSONObject

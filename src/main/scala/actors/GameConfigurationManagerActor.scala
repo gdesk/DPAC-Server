@@ -2,6 +2,7 @@ package actors
 
 import akka.actor.{ActorSelection, Props, UntypedAbstractActor}
 import model.Match
+import utils.ActorsUtils
 
 import scala.util.parsing.json.JSONObject
 

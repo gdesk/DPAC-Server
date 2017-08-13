@@ -2,6 +2,8 @@ package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
 import model.{ImmutableUser, User}
+import utils.ActorsUtils
+
 import scala.util.parsing.json.JSONObject
 
 /** Actor that manage the registration of a new user user.

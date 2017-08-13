@@ -6,8 +6,7 @@ import java.io.File
 import java.nio.file.{Files, Path, Paths}
 import javax.swing.ImageIcon
 
-import actors.ActorsUtils
-import utils.Direction
+import utils.{ActorsUtils, Direction, Utils}
 
 /**
   * Created by Manuel Bottax on 25/07/2017.
@@ -27,7 +26,7 @@ class Character (val name: String) {
   def addImage(file: File) : Unit = {
 
     val image: Image = new ImageIcon (file.getPath).getImage
-    val buff: Array[Byte] = ActorsUtils.toByteArray(image)
+    val buff: Array[Byte] = Utils.toByteArray(image)
     imageList += (file.getPath -> buff)
   }
 

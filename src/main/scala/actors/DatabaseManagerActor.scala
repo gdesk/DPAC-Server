@@ -3,6 +3,7 @@ package actors
 import akka.actor.UntypedAbstractActor
 import database.DatabaseQuery
 import model.{MatchResult, MatchResultImpl, User}
+import utils.ActorsUtils
 
 import scala.util.parsing.json.JSONObject
 

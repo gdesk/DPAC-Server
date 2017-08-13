@@ -1,9 +1,10 @@
 
 import java.net.InetAddress
 
-import actors.{ActorsUtils, MessageDispatcherActor, MessageReceiverActor}
+import actors.{MessageDispatcherActor, MessageReceiverActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
+import utils.ActorsUtils
 
 /** The main class for the server application.
   * It configure the server and start actors system.
