@@ -39,119 +39,117 @@ object Main {
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
 
 
-/*
+    /*
 
-    //test manuale
-    messageReceiver ! JSONObject(Map[String, String](
-          "object" -> "newUser",
-          "name" -> "testUser",
+        //test manuale
+        messageReceiver ! JSONObject(Map[String, String](
+              "object" -> "newUser",
+              "name" -> "testUser",
+              "username" -> "myUserName",
+              "email" -> "me@mail.com",
+              "password" -> "pswd",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+
+        messageReceiver ! JSONObject(Map[String, String](
+          "object" -> "login",
           "username" -> "myUserName",
-          "email" -> "me@mail.com",
+          "password" -> "pswd",
+          "senderIP" -> "127.0.0.1"
+        ))
+
+        messageReceiver ! JSONObject(Map[String, String](
+          "object" -> "login",
+          "username" -> "myUserName2",
+          "password" -> "pswd",
+          "senderIP" -> "127.0.0.1"
+        ))
+
+        messageReceiver ! JSONObject(Map[String, String](
+          "object" -> "login",
+          "username" -> "myUserName3",
+          "password" -> "pswd",
+          "senderIP" -> "127.0.0.1"
+        ))
+
+        messageReceiver ! JSONObject(Map[String, String](
+          "object" -> "login",
+          "username" -> "myUserName4",
+          "password" -> "pswd",
+          "senderIP" -> "127.0.0.1"
+        ))
+    */
+
+        messageReceiver ! JSONObject(Map[String, String](
+          "object" -> "playgrounds",
+          "username" -> "myUserName4",
           "password" -> "pswd",
           "senderIP" -> "127.0.0.1"
         ))
 
 
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName2",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName3",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName4",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    /*
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "playgrounds",
-      "username" -> "myUserName4",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "chosenPlayground",
+          "playground" -> 1,
+          "senderIP" -> "127.0.0.1"
+        ))
 
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "chosenPlayground",
-      "playground" -> 1,
-      "playersNumber" -> 2,
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "chosenPlayground",
+          "playground" -> 2,
+          "senderIP" -> "127.0.0.1"
+        ))
 
+        /*
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "chosenPlayground",
-      "playground" -> 2,
-      "playersNumber" -> 2,
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "selectedRange",
+          "range" -> Range(1,5),
+          "senderIP" -> "127.0.0.1"
+        ))
 
-    */
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "selectedRange",
+          "range" -> Range(1,5),
+          "senderIP" -> "127.0.0.1"
+        ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "selectedRange",
-      "range" -> Range(1,5),
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "selectedRange",
-      "range" -> Range(1,5),
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "selectedRange",
-      "range" -> Range(1,5),
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "selectedRange",
+          "range" -> Range(1,5),
+          "senderIP" -> "127.0.0.1"
+        ))
 
 
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "startGame",
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "startGame",
+          "senderIP" -> "127.0.0.1"
+        ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "serverIsRunning",
+          "senderIP" -> "127.0.0.1"
+        ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "serverIsRunning",
+          "senderIP" -> "127.0.0.1"
+        ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "serverIsRunning",
+          "senderIP" -> "127.0.0.1"
+        ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
+        messageReceiver ! JSONObject(Map[String, Any](
+          "object" -> "serverIsRunning",
+          "senderIP" -> "127.0.0.1"
+        ))
 
-    */
+        */
 
   }
 }

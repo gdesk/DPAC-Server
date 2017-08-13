@@ -58,15 +58,19 @@ object Utils {
 
     val playground: Playground = IOUtils.getPlaygroundFromFile(playgroundFile)
 
+    val cellRowsSize: Int = 16
+    val cellColsSize: Int = 12
 
     val view: MicroMapPanel = new MicroMapPanel(playground)
 
-    val f: JFrame = new JFrame("test")
-    f.setSize(512,512)
+    view.setSize(playground.dimension.x * cellColsSize, playground.dimension.y * cellRowsSize)
+
+    val f: JFrame = new JFrame("New Playground Image")
+    f.setSize(playground.dimension.x * cellColsSize, playground.dimension.y * cellRowsSize)
     f.setContentPane(view)
     f.setVisible(true)
 
-    saveComponentAsJPEG(view, "" + playgroundFile.getName + ".jpg")
+    saveComponentAsJPEG(view, f, "" + playgroundFile.getName + ".jpg")
 
     val playgroundImage: Image = new ImageIcon("playgroundImages/" + playgroundFile.getName + ".jpg").getImage
 
@@ -74,17 +78,17 @@ object Utils {
 
   }
 
-  private def saveComponentAsJPEG(myComponent: JPanel, filename: String): Unit = {
+  private def saveComponentAsJPEG(myComponent: JPanel, frame: JFrame, filename: String): Unit = {
 
   import java.awt.image.BufferedImage
   import java.io.FileOutputStream
   import com.sun.image.codec.jpeg.JPEGCodec
 
-    //myComponent.setBackground(Color.white)
-
     val size = myComponent.getSize()
 
-    val myImage = new BufferedImage(size.getWidth.toInt,size.getHeight.toInt, BufferedImage.TYPE_INT_RGB) //myComponent.createImage(512,512)//
+    println("MyComponentSize: " + size.height + " - " + size.width)
+
+    val myImage = new BufferedImage(size.getWidth.toInt,size.getHeight.toInt, BufferedImage.TYPE_INT_RGB)
     val g2 = myImage.createGraphics
     myComponent.paint(g2)
 
@@ -97,5 +101,7 @@ object Utils {
       case e: Exception =>
         System.out.println(e)
     }
+
+    frame.dispose()
   }
 }
