@@ -30,8 +30,12 @@ class Character (val name: String) {
     imageList += (file.getPath -> buff)
   }
 
-  //var characterImage: Image = new ImageIcon("src/main/resources/characters/pacman/24x24/Right.png").getImage
-  var characterImage: File = new File("src/main/resources/characters/pacman/24x24/Right.png")
+  var characterImage: File = {
+    name match {
+      case "pacman" => new File ("src/main/resources/characters/pacman/24x24/Right.png")
+      case x : String => new File ("src/main/resources/characters/ghosts/" + x + "/24x24/Right.png")
+    }
+  }
 
 }
 
