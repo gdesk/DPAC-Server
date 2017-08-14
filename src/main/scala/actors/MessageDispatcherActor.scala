@@ -1,7 +1,5 @@
 package actors
 
-import java.util.Calendar
-
 import akka.actor.{ActorSelection, UntypedAbstractActor}
 import model._
 import utils.ActorsUtils
@@ -125,7 +123,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       //notify other client that the player has joined the match
       selectedMatch.involvedPlayer.foreach((x) => {
         val reply: JSONObject = JSONObject(Map[String, Any](
-          "object" -> "playerInMatch" ))
+          "object" -> "playerInMatch",
+          "players" -> selectedMatch.involvedPlayer.size ))
         sendNotificationMessage(x,reply)
       })
     }
@@ -363,7 +362,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     println("Send notification message to : " + ipAddress)
 
     // this message is received from the notification handler actor of the client
-    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/FromServerCommunication")
+    val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/fromServerCommunication")
     receiver ! message
   }
 
