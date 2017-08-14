@@ -129,7 +129,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       })
     }
 
-      // handler for friend request
+    // handler for friend request
     case "addFriend" => {
       val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
