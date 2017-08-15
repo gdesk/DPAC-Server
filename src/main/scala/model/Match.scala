@@ -15,7 +15,7 @@ class Match (var involvedPlayerIP: List[String], val size: Range){
     var addedToMatch: Boolean = false
     val list =  involvedPlayerIP.find((x) => x == playerIP)
 
-    if(list.isEmpty) {
+    if(list isEmpty) {
       involvedPlayerIP = involvedPlayerIP ::: List(playerIP)
       addedToMatch = true
     }

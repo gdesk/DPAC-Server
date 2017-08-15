@@ -5,19 +5,15 @@ import model.Match
 import utils.ActorsUtils
 import scala.util.parsing.json.JSONObject
 
-/** Actor that manage the people waitnig for a match and the initial configuration of the game.
+/** Actor that manage the people waiting for a match and the initial configuration of the game.
   *
   * @author manuBottax
   */
 class GameConfigurationManagerActor extends UntypedAbstractActor {
 
-  private def MIN_PLAYER(v: Int): Int = 3 + 2 * v
-  private def MAX_PLAYER(v: Int): Int = 5 + 2 * v
 
-  //todo: controllare se sono i range giusti
-  private val availableRange: List[Range] = List( Range(MIN_PLAYER(0), MAX_PLAYER(0)),  // 3 - 5
-                                                  Range(MIN_PLAYER(1), MAX_PLAYER(1)),  // 5 - 7
-                                                  Range(MIN_PLAYER(2), MAX_PLAYER(2)))  // 7 - 9
+  private val availableRange: List[Range] = List( Range(3,5),
+                                                  Range(6,9))
 
   private var waitingMatch: List[Match] = List()
 
@@ -55,7 +51,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
         }
 
         else{
-          System.err.println("Player Already in match, cannot add")
+          System.err.println(s"Player $ip already in match, cannot add")
         }
       }
 
@@ -87,7 +83,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
     }
 
     else {
-      System.err.println("Error ! non connencted client want to start a game ! ")
+      System.err.println("Error ! non connected client want to start a game ! ")
     }
   }
 

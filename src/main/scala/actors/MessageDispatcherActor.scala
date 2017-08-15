@@ -83,12 +83,12 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
         println("OnlineClient: " + onlineClient.size)
 
-        println(s"$username has logged out")
+        print (s"$username has logged out - ")
 
         onlineClient = onlineClient.filterNot((x) => x.IPAddress == user.get.IPAddress)
         val currentMatch = getMatchFor(user.get.IPAddress)
 
-        print("now online: " + onlineClient.size)
+        println ("now online: " + onlineClient.size)
 
         if (currentMatch isDefined) {
 
@@ -326,7 +326,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       if(currentMatch.isDefined){
         sender() ! JSONObject(Map[String, Any](
           "object" -> "matchSize",
-          "matchSize" -> currentMatch.get.involvedPlayerIP.size ))
+          "matchSize" -> currentMatch.get.involvedPlayerIP.size,
+          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
       }
     }
 
@@ -426,7 +427,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     val ipList: List[String] = getMatchFor(excludedClient).get.involvedPlayerIP
 
     if (ipList.nonEmpty){
-      println("sending notification to " + ipList.size + " clients")
+      println("sending notification to " + (ipList.size -1) + " clients")
       ipList.foreach((x) => if (x != excludedClient) sendNotificationMessage(x,message))
     }
   }

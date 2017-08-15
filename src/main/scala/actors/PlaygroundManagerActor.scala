@@ -53,7 +53,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
       currentVoteCount = currentVoteCount + 1
 
       // request the size for the current match
-      context.actorSelection("user/messageDispatcher") ! JSONObject(Map[String, Any](
+      context.actorSelection("/user/messageDispatcher") ! JSONObject(Map[String, Any](
         "object" -> "getMatchSize",
         "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
 
