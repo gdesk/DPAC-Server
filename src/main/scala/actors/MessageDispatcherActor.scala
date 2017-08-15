@@ -121,10 +121,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       println("new player in match")
 
       //notify other client that the player has joined the match
-      selectedMatch.involvedPlayer.foreach((x) => {
+      selectedMatch.involvedPlayerIP.foreach((x) => {
         val reply: JSONObject = JSONObject(Map[String, Any](
           "object" -> "playerInMatch",
-          "players" -> selectedMatch.involvedPlayer.size ))
+          "players" -> selectedMatch.involvedPlayerIP.size ))
         sendNotificationMessage(x,reply)
       })
     }
@@ -140,7 +140,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       val friend: Option[Client] = getClient(username)
 
       if (friend.isDefined) {
-        val friendIP: String = friend.get.ip
+        val friendIP: String = friend.get.IPAddress
 
         println("Send friend request")
 
@@ -307,7 +307,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       if(currentMatch.isDefined){
         sender() ! JSONObject(Map[String, Any](
           "object" -> "matchSize",
-          "matchSize" -> currentMatch.get.involvedPlayer.size ))
+          "matchSize" -> currentMatch.get.involvedPlayerIP.size ))
       }
     }
 
@@ -373,7 +373,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     * @param message: the message to be sent
     */
   private def broadcastMessage(ip: String, message: JSONObject): Unit = {
-    val ipList: List[String] = getMatchFor(ip).get.involvedPlayer
+    val ipList: List[String] = getMatchFor(ip).get.involvedPlayerIP
 
     if (ipList.nonEmpty){
       println("broadcast message to " + ipList.size + " client")
@@ -388,7 +388,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     * @param message: the message to be sent
     */
   private def broadcastConfigurationMessage(ip: String, message: JSONObject): Unit = {
-    val ipList: List[String] = getMatchFor(ip).get.involvedPlayer
+    val ipList: List[String] = getMatchFor(ip).get.involvedPlayerIP
 
     if (ipList.nonEmpty){
       println("broadcast configuration message to " + ipList.size + " client")
@@ -404,7 +404,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     * @param message: the message to be sent
     */
   private def notifyOtherClient(excludedClient: String, message: Any): Unit =  {
-    val ipList: List[String] = getMatchFor(excludedClient).get.involvedPlayer
+    val ipList: List[String] = getMatchFor(excludedClient).get.involvedPlayerIP
 
     if (ipList.nonEmpty){
       println("sending notification to " + ipList.size + " clients")
@@ -418,7 +418,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   }
 
   private def getMatchFor(ip: String): Option[Match] = {
-    onlineMatch.find((x) => x.involvedPlayer.contains(ip))
+    onlineMatch.find((x) => x.involvedPlayerIP.contains(ip))
   }
 
 

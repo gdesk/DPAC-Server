@@ -1,25 +1,22 @@
 package model
 
-import java.net.InetAddress
 
-import scala.util.Random
-
-/**
-  * Created by Manuel Bottax on 26/07/2017.
+/** A single match of the game.
+  *
+  * @param involvedPlayerIP: the list of the IP address of player connected in this match.
+  * @param size: the range for this match. it identify the minimum and maximum player number for the match.
   */
-
-class Match (var involvedPlayer: List[String], val size: Range){
+class Match (var involvedPlayerIP: List[String], val size: Range){
 
   val id: Int = scala.util.Random.nextInt
-
   var readyPlayer: Int = 0
 
   def addPlayer (playerIP: String): Boolean = {
     var addedToMatch: Boolean = false
-    val list =  involvedPlayer.find((x) => x == playerIP)
+    val list =  involvedPlayerIP.find((x) => x == playerIP)
 
     if(list.isEmpty) {
-      involvedPlayer = involvedPlayer ::: List(playerIP)
+      involvedPlayerIP = involvedPlayerIP ::: List(playerIP)
       addedToMatch = true
     }
 
@@ -27,12 +24,12 @@ class Match (var involvedPlayer: List[String], val size: Range){
   }
 
   def addReadyPlayer(playerIP: String): Unit = {
-    if (involvedPlayer contains playerIP) {
+    if (involvedPlayerIP contains playerIP) {
       readyPlayer = readyPlayer + 1
-      println("New ready player, " + (involvedPlayer.size - readyPlayer) + " left.")
+      println("New ready player, " + (involvedPlayerIP.size - readyPlayer) + " left.")
     }
   }
 
-  def canStart: Boolean = readyPlayer == involvedPlayer.size
+  def canStart: Boolean = readyPlayer == involvedPlayerIP.size
 
 }

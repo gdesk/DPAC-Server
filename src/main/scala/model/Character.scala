@@ -25,9 +25,9 @@ class Character (val name: String) {
   }
 
   def addResource(file: File) : Unit = {
-
     val image: Image = new ImageIcon (file.getPath).getImage
     val buff: Array[Byte] = Utils.toByteArray(image)
+
     resourceList += (file.getPath -> buff)
   }
 
@@ -35,7 +35,6 @@ class Character (val name: String) {
     name match {
       case "pacman" => Utils.toByteArray(new ImageIcon("src/main/resources/characters/pacman/24x24/Right.png").getImage)
       case x: String => Utils.toByteArray(new ImageIcon("src/main/resources/characters/ghosts/" + x + "/24x24/Right.png").getImage)
-
     }
   }
 

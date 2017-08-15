@@ -47,7 +47,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       if (selectedMatch.isDefined){
         if (selectedMatch.get.addPlayer(ip)) {
           println("Assigned to a match")
-          println("Player in match: " + selectedMatch.get.involvedPlayer.size)
+          println("Player in match: " + selectedMatch.get.involvedPlayerIP.size)
 
           sender() ! JSONObject(Map[String, Any](
             "object" -> "newPlayerInMatch",
@@ -94,9 +94,9 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       // received when a friend accept a friend request
     case "updateMatch" =>{
       val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
-      val m = getMatchFor(currentMatch.involvedPlayer.headOption.get)
+      val m = getMatchFor(currentMatch.involvedPlayerIP.headOption.get)
 
-      m.get.involvedPlayer = currentMatch.involvedPlayer
+      m.get.involvedPlayerIP = currentMatch.involvedPlayerIP
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
@@ -118,7 +118,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
   private def getMatchFor(clientIP: String): Option[Match] = {
 
     for ( x <- waitingMatch) {
-      val l: List[String] = x.involvedPlayer.filter((x) => x == clientIP)
+      val l: List[String] = x.involvedPlayerIP.filter((x) => x == clientIP)
       if (l.nonEmpty){
         return Option(x)
       }
