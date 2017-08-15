@@ -36,7 +36,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
         i = i + 1
       }
 
-      println("Found " + playgroundImages.size + "playgrounds")
+      println("Found " + playgroundImages.size + " playgrounds")
 
       sender() ! JSONObject(Map[String, Any](
                  "object" -> "AvailablePlaygrounds",

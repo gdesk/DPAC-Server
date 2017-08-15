@@ -77,9 +77,14 @@ object Utils {
     f.setContentPane(view)
     f.setVisible(true)
 
-    saveComponentAsJPEG(view, f, "" + playgroundFile.getName + ".jpg")
+    val path: String = "src/main/resources/playgroundImages/"
 
-    val playgroundImage: Image = new ImageIcon("playgroundImages/" + playgroundFile.getName + ".jpg").getImage
+    val dir: File = new File (path)
+    dir.mkdir()
+
+    saveComponentAsJPEG(view, f, path + playgroundFile.getName + ".jpg")
+
+    val playgroundImage: Image = new ImageIcon(path + playgroundFile.getName + ".jpg").getImage
 
     toByteArray(playgroundImage)
 
@@ -133,15 +138,17 @@ object Utils {
 
   private def toBufferedImage(src: Image): BufferedImage = {
 
-    //todo: aggiusta
     val w = src.getWidth(null)
     val h = src.getHeight(null)
     val `type` = BufferedImage.TYPE_INT_ARGB
 
-    val dest = new BufferedImage(1024,1024,`type`)
+
+
+    val dest = new BufferedImage(w,h,`type`)
     val g2 = dest.createGraphics
     g2.drawImage(src, 0, 0, null)
     g2.dispose()
     dest
   }
+
 }

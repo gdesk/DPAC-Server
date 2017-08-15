@@ -26,7 +26,7 @@ object Main {
     println()
 
     val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
-    println("my IP: " + myIP)
+    println(" -- my IP: " + myIP + " --")
 
     val config = ConfigFactory.parseString(
       " akka { \n" +
@@ -36,7 +36,7 @@ object Main {
         " remote { \n" +
           " enabled-transports = [\"akka.remote.netty.tcp\"]\n" +
           " netty.tcp { \n" +
-            " hostname = \"" + myIP +"\"\n" +
+            " hostname = \"" + "192.168.1.21" +"\"\n" +
             " port = 2552\n" +
           "}\n" +
         "}\n" +
