@@ -151,6 +151,16 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       })
     }
 
+    case "removePlayerFromMatch" => {
+      val selectedMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
+      val senderIP: String = ActorsUtils.getSenderIP(message)
+
+      println(s" $senderIP added to a new match, removing from the previous one ( n° " + selectedMatch.id + ")" )
+
+      selectedMatch.removePlayer(senderIP)
+    }
+
+
     // handler for friend request
     case "addFriend" => {
       val senderIP: String = ActorsUtils.getSenderIP(message)
@@ -324,7 +334,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       val senderIP: String = ActorsUtils.getSenderIP(message)
       val currentMatch: Option[Match] = getMatchFor(senderIP)
 
-      println("requested match size.")
+      println("requested match size for match n° " + currentMatch.get.id)
 
       if(currentMatch.isDefined){
         sender() ! JSONObject(Map[String, Any](
@@ -441,7 +451,13 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   }
 
   private def getMatchFor(ip: String): Option[Match] = {
-    onlineMatch.find((x) => x.involvedPlayerIP.contains(ip))
+    val selected = onlineMatch.find((x) => x.involvedPlayerIP.contains(ip))
+
+    if( selected.isDefined) {
+      println("selected match n° " + selected.get.id)
+    }
+
+    selected
   }
 
 

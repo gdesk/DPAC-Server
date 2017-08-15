@@ -71,7 +71,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
       }
     }
 
-      // request for the data of other character choesn for the match
+      // request for the data of other character chosen for the match
     case "teamCharacterRequest" => {
 
       println("Request data for all the match characters")
@@ -90,9 +90,11 @@ class CharacterManagerActor extends UntypedAbstractActor {
           "typeCharacter" -> associationMap,
           "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
+    }
+
+    case "clear" => {
       //ho finito e quindi reinizializzo le liste ai valori iniziali per poter gestire la prossima partita
       cleanCharacterManager()
-
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))

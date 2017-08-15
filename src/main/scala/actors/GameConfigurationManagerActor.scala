@@ -42,7 +42,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
       if (selectedMatch.isDefined){
         if (selectedMatch.get.addPlayer(ip)) {
-          println("Assigned to a match")
+          println("Assigned to match n° " + selectedMatch.get.id)
           println("Player in match: " + selectedMatch.get.involvedPlayerIP.size)
 
           sender() ! JSONObject(Map[String, Any](
@@ -55,9 +55,19 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
           System.err.println(s"Player $ip already in match, cannot add. Assign to a new match.")
           val current = new Match(List(),range)
           current.addPlayer(ip)
-          waitingMatch = waitingMatch ::: List(current)
 
-          sender() ! JSONObject(Map[String, Any](
+          println("Assigned to a new match ( n° " + current.id + " )")
+
+          waitingMatch = List(current) ::: waitingMatch
+
+          val selection = context.actorSelection("/user/messageDispatcher")
+
+          selection ! JSONObject(Map[String, Any](
+            "object" -> "removePlayerFromMatch",
+            "match" -> selectedMatch.get,
+            "senderIP" -> ip ))
+
+          selection ! JSONObject(Map[String, Any](
             "object" -> "newPlayerInMatch",
             "match" -> current,
             "senderIP" -> ip ))
@@ -88,6 +98,8 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
           "object" -> "clientCanConnect",
           "senderIP" -> senderIP
         ))
+
+        context.actorSelection("../characterManager") ! JSONObject(Map[String, Any]( "object" -> "clear" ))
       }
     }
 
@@ -113,7 +125,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
     val matches: List[Match] = waitingMatch.filter((x) => size == x.size)
 
     if (matches.isEmpty) {
-      waitingMatch = waitingMatch ::: List(new Match(List(),size))
+      waitingMatch = List(new Match(List(),size)) ::: waitingMatch
       return waitingMatch
     }
 

@@ -1,5 +1,6 @@
 
-import java.net.InetAddress
+import java.net.{InetAddress, NetworkInterface}
+import java.util
 
 import actors.{MessageDispatcherActor, MessageReceiverActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
@@ -25,7 +26,8 @@ object Main {
     println("-- Server configuration and startup --")
     println()
 
-    val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
+    //val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
+    val myIP = ActorsUtils.parseIP(NetworkInterface.getByName("wlan1").getInetAddresses.nextElement().toString)
     println(" -- my IP: " + myIP + " --")
 
     val config = ConfigFactory.parseString(
@@ -36,7 +38,7 @@ object Main {
         " remote { \n" +
           " enabled-transports = [\"akka.remote.netty.tcp\"]\n" +
           " netty.tcp { \n" +
-            " hostname = \"" + "192.168.1.21" +"\"\n" +
+            " hostname = \"" + myIP +"\"\n" +
             " port = 2552\n" +
           "}\n" +
         "}\n" +

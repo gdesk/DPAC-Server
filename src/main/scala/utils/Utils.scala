@@ -117,8 +117,6 @@ object Utils {
 
     val size = myComponent.getSize()
 
-    println("MyComponentSize: " + size.height + " - " + size.width)
-
     val myImage = new BufferedImage(size.getWidth.toInt,size.getHeight.toInt, BufferedImage.TYPE_INT_RGB)
     val g2 = myImage.createGraphics
     myComponent.paint(g2)
@@ -141,8 +139,6 @@ object Utils {
     val w = src.getWidth(null)
     val h = src.getHeight(null)
     val `type` = BufferedImage.TYPE_INT_ARGB
-
-
 
     val dest = new BufferedImage(w,h,`type`)
     val g2 = dest.createGraphics
