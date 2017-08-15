@@ -314,7 +314,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       println("Servers ready. Clients can connect.")
 
       val reply: JSONObject = JSONObject(Map[String, Any](
-        "object" -> "ClientCanStartRunning"))
+        "object" -> "clientCanConnect"))
 
       broadcastConfigurationMessage(ActorsUtils.getSenderIP(message), reply)
     }
