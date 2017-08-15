@@ -2,7 +2,8 @@
 .idea/
 
 # generated image
-src/main/resources/playgroundImages/*
+src\main\resources\playgroundImages\*
+# src/main/resources/playgroundImages/*
 *.jpg
 
 # Compiled class file
