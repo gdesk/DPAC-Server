@@ -79,7 +79,26 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       val user: Option[Client] = getClient(username)
 
       if (user.isDefined) {
+
+
+        println("OnlineClient: " + onlineClient.size)
+
         println(s"$username has logged out")
+
+        onlineClient = onlineClient.filterNot((x) => x.IPAddress == user.get.IPAddress)
+        val currentMatch = getMatchFor(user.get.IPAddress)
+
+        print("now online: " + onlineClient.size)
+
+        if (currentMatch isDefined) {
+
+          onlineMatch = onlineMatch.filterNot((x) => x.involvedPlayerIP.contains(user.get.IPAddress))
+          currentMatch.get.involvedPlayerIP = currentMatch.get.involvedPlayerIP.filterNot((x) => x == user.get.IPAddress)
+
+          context.actorSelection("user/matchMaster/gameConfigurationManager") ! JSONObject(Map[String, Any](
+            "object" -> "updateMatch",
+            "match" -> currentMatch))
+        }
 
         val reply: JSONObject = JSONObject(Map[String, Any](
           "object" -> "logoutResponse",
