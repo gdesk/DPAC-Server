@@ -1,14 +1,12 @@
 package clientModel.model
 
-import java.io.FileInputStream
-
 import clientModel.model.gameElement.{Block, Eatable, GameItem}
-import clientModel.model.utilities.{Dimension, Point, PointImpl}
+import clientModel.model.utilities.{Dimension, PointImpl}
+import clientModel.model.utilities.{Point, PointImpl}
 
 import scala.collection.mutable.ListBuffer
 
-/**
-  * The game's playground. It contains all the elements in the game platform (except characters).
+/** The game's playground. It contains all the elements in the game platform (except characters).
   *
   * @author manuBottax
   * @author Margherita Pecorelli
@@ -39,7 +37,7 @@ trait Playground {
   /**
     * Sets the Map which contains all the elements of the current match.
     *
-    * @throws AlredyUsedPositionException when the position is already occupied by another object.
+    * @throws AlreadyUsedPositionException when the position is already occupied by another object.
     * @param elementsMap - the map with all match's elements.
     */
   def ground_=(elementsMap: List[GameItem]): Unit
@@ -107,9 +105,7 @@ trait Playground {
   * @constructor create an empty playground.
   */
 
-
-
-case class PlaygroundImpl private() extends Playground{
+class PlaygroundImpl extends Playground{
 
   //private var engine = ScalaProlog.mkPrologEngine(new Theory(new FileInputStream("src/main/prolog/dpac-prolog.pl")))
 
@@ -131,7 +127,7 @@ case class PlaygroundImpl private() extends Playground{
   /**
     * Sets the Map which contains all the elements of the current match.
     *
-    * @throws AlredyUsedPositionException when the position is already occupied by another object.
+    * @throws AlreadyUsedPositionException when the position is already occupied by another object.
     * @param elementsMap - the map with all match's elements.
     */
   override def ground_=(elementsMap: List[GameItem]) = {
@@ -207,13 +203,13 @@ case class PlaygroundImpl private() extends Playground{
     * Checks if item's position is inside the playground and if is empty.
     *
     * @param item - the item to which the position must be controlled.
-    * @throws AlredyUsedPositionException when the position is already occupied by another object.
+    * @throws AlreadyUsedPositionException when the position is already occupied by another object.
     */
   private def checkItemPosition(item: GameItem) = {
     checkPosition(item.position)
-    hawManyItemInPosition(item position) match {
+    howManyItemInPosition(item position) match {
       case x if(x>1) =>
-        throw new AlredyUsedPositionException("Position ("+ item.position.x + "," + item.position.y + ") already occupied by another item!")
+        throw new AlreadyUsedPositionException("Position ("+ item.position.x + "," + item.position.y + ") already occupied by another item!")
       case _ =>
     }
   }
@@ -224,7 +220,7 @@ case class PlaygroundImpl private() extends Playground{
     * @param position - the position to check.
     * @return the number of items in the same position.
     */
-  private def hawManyItemInPosition(position: Point[Int, Int]): Int = _ground filter (e => e.position equals position) size
+  private def howManyItemInPosition(position: Point[Int, Int]): Int = _ground filter (e => e.position equals position) size
 
   /**
     * Returns a list of all street's positions.
@@ -269,22 +265,6 @@ case class PlaygroundImpl private() extends Playground{
 
 }
 
-object PlaygroundImpl {
-
-  private var _instance: PlaygroundImpl = null
-
-  /**
-    * Returns the only {@PlaygroundImpl}'s instance. Pattern Singleton.
-    *
-    * @return the only PlaygroundImpl's instance.
-    */
-  def instance(): PlaygroundImpl = {
-    if(_instance == null) _instance = PlaygroundImpl()
-    _instance
-  }
-
-}
-
 case class OutOfPlaygroundBoundAccessException(private val message: String = "") extends Exception(message)
 
-case class AlredyUsedPositionException(private val message: String = "") extends Exception(message)
+case class AlreadyUsedPositionException(private val message: String = "") extends Exception(message)

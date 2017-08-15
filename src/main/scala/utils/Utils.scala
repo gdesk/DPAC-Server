@@ -7,7 +7,8 @@ import java.net.URL
 import javax.imageio.ImageIO
 import javax.swing.{ImageIcon, JFrame, JPanel}
 
-import clientModel.model.{MicroMapPanel, Playground}
+import clientModel.model.Playground
+import clientModel.view.MicroMapPanel
 
 /** Various utils for image and collection handling.
   *

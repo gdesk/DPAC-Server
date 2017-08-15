@@ -1,4 +1,4 @@
-package clientModel.model.utilities;
+package utils;
 
 import utils.Utils;
 

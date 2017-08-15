@@ -18,9 +18,18 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
   override def preStart(): Unit = {
 
     characterManager = context.actorOf(Props[CharacterManagerActor], "characterManager")
+    println("[ Character manager actor creation completed ]")
     playgroundManager = context.actorOf(Props[PlaygroundManagerActor], "playgroundManager")
+    println("[ Playground manager actor creation completed ]")
     gameManager = context.actorOf(Props[GameConfigurationManagerActor], "gameConfigurationManager")
+    println("[ Game configuration manager actor creation completed ]")
     endGameManager = context.actorOf(Props[GameEndManagerActor], "gameEndManager")
+    println("[ End game manager actor creation completed ]")
+    println()
+    println("-- Actors creation completed, server is running -- ")
+    println()
+    println()
+    
   }
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {

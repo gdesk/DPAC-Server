@@ -1,5 +1,6 @@
-package clientModel.model;
+package clientModel.view;
 
+import clientModel.model.Playground;
 import clientModel.model.gameElement.Block;
 import clientModel.model.utilities.PointImpl;
 import utils.Utils;

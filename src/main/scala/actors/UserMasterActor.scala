@@ -21,10 +21,12 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
   override def preStart(): Unit = {
 
     databaseManager = context.actorOf(Props[DatabaseManagerActor] , "databaseManager")
+    println("[ Database manager actor creation completed ]")
     loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
+    println("[ Login manager actor creation completed ]")
     registrationManager = context.actorOf(Props[RegistrationManagerActor] , "registrationManager")
+    println("[ Registration manager actor creation completed ]")
 
-    super.preStart()
   }
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {

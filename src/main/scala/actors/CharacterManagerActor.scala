@@ -107,14 +107,11 @@ class CharacterManagerActor extends UntypedAbstractActor {
     var charResList: List[Character] = List()
     val pacman: Character = new Character("pacman")
 
-    var basePath: String = "src/main/resources/characters/"
+    val basePath: String = "src/main/resources/characters/"
 
     for( x <- Direction.values()){
-
       val path24: String = pacman.name.toLowerCase +"/24x24"
-      val f: File = new File(basePath + path24 + "/" + x.getDirection + ".png")
-      println(f.length())
-      pacman.addResource(f)
+      pacman.addResource(new File(basePath + path24 + "/" + x.getDirection + ".png"))
 
       val path32: String = pacman.name.toLowerCase +"/32x32"
       pacman.addResource(new File(basePath + path32 + "/" + x.getDirection + ".png"))

@@ -45,11 +45,13 @@ object Main {
     val system = ActorSystem.create("DpacServer", config)
 
     println()
-    println("-- Actors Creation --")
+    println("-- Actors creation --")
     println()
 
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor] , "messageDispatcher")
+    println("[ Message dispatcher actor creation completed ]")
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
+    println("[ Message receiver actor creation completed ]")
 
 
     /*
