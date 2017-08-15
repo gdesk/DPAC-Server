@@ -47,11 +47,20 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
           sender() ! JSONObject(Map[String, Any](
             "object" -> "newPlayerInMatch",
-            "match" -> selectedMatch.get ))
+            "match" -> selectedMatch.get,
+            "senderIP" -> ip))
         }
 
         else{
-          System.err.println(s"Player $ip already in match, cannot add")
+          System.err.println(s"Player $ip already in match, cannot add. Assign to a new match.")
+          val current = new Match(List(),range)
+          current.addPlayer(ip)
+          waitingMatch = waitingMatch ::: List(current)
+
+          sender() ! JSONObject(Map[String, Any](
+            "object" -> "newPlayerInMatch",
+            "match" -> current,
+            "senderIP" -> ip ))
         }
       }
 

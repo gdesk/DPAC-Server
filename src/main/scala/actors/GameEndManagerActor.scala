@@ -1,7 +1,5 @@
 package actors
 
-import java.util.Calendar
-
 import akka.actor.UntypedAbstractActor
 import model.{MatchResult, User}
 import utils.ActorsUtils

@@ -135,7 +135,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     case "newPlayerInMatch" => {
       val selectedMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
 
-      onlineMatch = onlineMatch ::: List(selectedMatch)
+
+      if (! onlineMatch.contains(selectedMatch)) {
+        onlineMatch = onlineMatch ::: List(selectedMatch)
+      }
 
       println("new player in match")
 

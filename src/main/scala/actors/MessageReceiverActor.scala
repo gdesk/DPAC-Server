@@ -26,7 +26,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
 
   override def onReceive(message: Any): Unit = {
 
-    println("Received a new message [ " + message.asInstanceOf[JSONObject].obj("object")  + " ] !")
+    println("Received a new message [ " + ActorsUtils.messageType(message)  + " ] !")
 
     ActorsUtils.messageType(message) match {
 
@@ -60,7 +60,6 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
       case "characterToChooseRequest" => matchMaster ! message //ok
 
         // message received from client when a character is selected -> check for availability and assign it
-        // todo: non mi ricordo più se notifico la scelta o no.
       case "chooseCharacter" => matchMaster ! message // ok
 
         // message received from client when a user want to receive the list of all the character for current match
@@ -82,7 +81,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
         // message received from client when the match end -> used to save the result into the database
       case "matchResult" => matchMaster ! message
 
-      case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
+      case _ => println(getSelf() + " received unknown message: " + ActorsUtils.messageType(message))
 
     }
   }

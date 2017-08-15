@@ -87,7 +87,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
         sender() ! JSONObject(Map[String, Any](
           "object" -> "characterChosen",
           "map" -> characterList,
-          "typeCharacters" -> associationMap,
+          "typeCharacter" -> associationMap,
           "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
       //ho finito e quindi reinizializzo le liste ai valori iniziali per poter gestire la prossima partita
