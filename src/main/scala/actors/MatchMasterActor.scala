@@ -29,7 +29,7 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
     println("-- Actors creation completed, server is running -- ")
     println()
     println()
-    
+
   }
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
