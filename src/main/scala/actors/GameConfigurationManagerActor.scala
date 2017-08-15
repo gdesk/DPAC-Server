@@ -134,6 +134,15 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   private def getMatchFor(clientIP: String): Option[Match] = {
 
+    val selected = waitingMatch.find((x) => x.involvedPlayerIP.contains(clientIP))
+
+    if( selected.isDefined) {
+      println("selected match n° " + selected.get.id)
+    }
+
+    selected
+
+    /*
     for ( x <- waitingMatch) {
       val l: List[String] = x.involvedPlayerIP.filter((x) => x == clientIP)
       if (l.nonEmpty){
@@ -141,6 +150,8 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       }
     }
     Option.empty[Match]
+
+    */
   }
 }
 

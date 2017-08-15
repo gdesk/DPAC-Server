@@ -137,7 +137,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
 
       if (! onlineMatch.contains(selectedMatch)) {
-        onlineMatch = onlineMatch ::: List(selectedMatch)
+        onlineMatch =  List(selectedMatch) ::: onlineMatch
       }
 
       println("new player in match")
@@ -377,7 +377,9 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     */
   private def sendConfigurationMessage(ipAddress: String, message: Any): Unit = {
 
-    println("Send Configuration message to : " + ipAddress)
+    val msgType: String = ActorsUtils.messageType(message)
+
+    println("Send Configuration message [ " + msgType + " ] to : " + ipAddress)
 
     // this message is received from the P2P configuration actor
     val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/P2PCommunication")
@@ -392,7 +394,9 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     */
   private def sendNotificationMessage(ipAddress: String, message: Any): Unit = {
 
-    println("Send notification message to : " + ipAddress)
+    val msgType: String = ActorsUtils.messageType(message)
+
+    println("Send notification message " + msgType + " to : " + ipAddress)
 
     // this message is received from the notification handler actor of the client
     val receiver: ActorSelection = context.actorSelection("akka.tcp://DpacClient@" + ipAddress + ":2554" + "/user/fromServerCommunication")
@@ -451,7 +455,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   }
 
   private def getMatchFor(ip: String): Option[Match] = {
-    val selected = onlineMatch.find((x) => x.involvedPlayerIP.contains(ip))
+    val selected: Option[Match] = onlineMatch.find((x) => x.involvedPlayerIP.contains(ip))
 
     if( selected.isDefined) {
       println("selected match n° " + selected.get.id)
