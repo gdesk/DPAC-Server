@@ -17,10 +17,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
   /** Start the main Actors that handle user-related message and match-related message */
   override def preStart(): Unit = {
     userMaster = context.actorOf(UserMasterActor.props(messageDispatcher), "userMaster")
-    println("userMaster actor created")
-
     matchMaster = context.actorOf(MatchMasterActor.props(messageDispatcher), "matchMaster")
-    println("matchMaster actor created")
 
     super.preStart()
   }

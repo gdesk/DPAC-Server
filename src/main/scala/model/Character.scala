@@ -1,19 +1,20 @@
 package model
 
 import java.awt.Image
-import java.awt.image.BufferedImage
 import java.io.File
-import java.nio.file.{Files, Path, Paths}
 import javax.swing.ImageIcon
 
-import utils.{ActorsUtils, Direction, Utils}
+import utils.Utils
 
-/**
-  * Created by Manuel Bottax on 25/07/2017.
+/** A class that represent a character on the server.
+  *
+  * @param name: The id name of the character.
+  *
+  * @author manuBottax.
   */
 class Character (val name: String) {
 
-  var imageList: Map[String,Array[Byte]] = Map()
+  var resourceList: Map[String,Array[Byte]] = Map()
   var ownerIP: String = ""
 
   def getType: String = {
@@ -23,17 +24,18 @@ class Character (val name: String) {
       "ghost"
   }
 
-  def addImage(file: File) : Unit = {
+  def addResource(file: File) : Unit = {
 
     val image: Image = new ImageIcon (file.getPath).getImage
     val buff: Array[Byte] = Utils.toByteArray(image)
-    imageList += (file.getPath -> buff)
+    resourceList += (file.getPath -> buff)
   }
 
-  var characterImage: File = {
+  var characterMainImage: Array[Byte] = {
     name match {
-      case "pacman" => new File ("src/main/resources/characters/pacman/24x24/Right.png")
-      case x : String => new File ("src/main/resources/characters/ghosts/" + x + "/24x24/Right.png")
+      case "pacman" => Utils.toByteArray(new ImageIcon("src/main/resources/characters/pacman/24x24/Right.png").getImage)
+      case x: String => Utils.toByteArray(new ImageIcon("src/main/resources/characters/ghosts/" + x + "/24x24/Right.png").getImage)
+
     }
   }
 

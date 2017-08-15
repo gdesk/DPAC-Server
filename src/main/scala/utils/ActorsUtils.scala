@@ -21,6 +21,10 @@ object ActorsUtils {
     }
   }
 
+  def getSenderIP(message: Any): String = {
+    message.asInstanceOf[JSONObject].obj("senderIP").toString
+  }
+
   /** Get IP from INetAddress host information.
     *
     * @param host: the host address ( in format <ipAddress>:<port> )

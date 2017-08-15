@@ -27,10 +27,9 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
       println("Now available: " + availableCharacter.size)
 
-      var retList: Map[String,File] = Map()
+      var retList: Map[String,Array[Byte]] = Map()
 
-      //todo: è da testare se va o se bisogna fare un array[byte] come dalle altre parti, o se farlo per uniformità
-      availableCharacter.foreach( (x) => retList += ((x.name, x.characterImage)) )
+      availableCharacter.foreach( (x) => retList += ((x.name, x.characterMainImage)) )
 
       sender() ! JSONObject(Map[String, Any](
                 "object" -> "characterToChoose",
@@ -115,16 +114,16 @@ class CharacterManagerActor extends UntypedAbstractActor {
       val path24: String = pacman.name.toLowerCase +"/24x24"
       val f: File = new File(basePath + path24 + "/" + x.getDirection + ".png")
       println(f.length())
-      pacman.addImage(f)
+      pacman.addResource(f)
 
       val path32: String = pacman.name.toLowerCase +"/32x32"
-      pacman.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
+      pacman.addResource(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
       val path48: String = pacman.name.toLowerCase +"/48x48"
-      pacman.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
+      pacman.addResource(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
       val path128: String = pacman.name.toLowerCase +"/128x128"
-      pacman.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
+      pacman.addResource(new File(basePath + path128 + "/" + x.getDirection + ".png"))
     }
 
     charResList = charResList ::: List (pacman)
@@ -135,16 +134,16 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
       for (x <- Direction.values()) {
         val path24: String = "ghosts/" + ghost.name.toLowerCase + "/24x24/"
-        ghost.addImage(new File(basePath + path24 + "/" + x.getDirection + ".png"))
+        ghost.addResource(new File(basePath + path24 + "/" + x.getDirection + ".png"))
 
         val path32: String = "ghosts/" + ghost.name.toLowerCase + "/32x32/"
-        ghost.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
+        ghost.addResource(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
         val path48: String = "ghosts/" + ghost.name.toLowerCase + "/48x48/"
-        ghost.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
+        ghost.addResource(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
         val path128: String = "ghosts/" + ghost.name.toLowerCase + "/128x128/"
-        ghost.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
+        ghost.addResource(new File(basePath + path128 + "/" + x.getDirection + ".png"))
       }
 
       charResList = charResList ::: List (ghost)
@@ -177,7 +176,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
     val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
 
     if(character.isDefined){
-      character.get.imageList
+      character.get.resourceList
     }
     else {
       Map()
