@@ -74,15 +74,24 @@ class CharacterManagerActor extends UntypedAbstractActor {
       // request for the data of other character chosen for the match
     case "teamCharacterRequest" => {
 
-      println("Request data for all the match characters")
+      println("Request data for the other characters of the match")
 
-      var characterList: Map[String, Map[String, Array[Byte]]] = Map()
+      val senderIp: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+      val requestedIP: String = message.asInstanceOf[JSONObject].obj("requestIP").toString
 
-      selectedCharacter.foreach((x) => characterList += (x.name -> getCharacterData(x.name)) )
+      val requestedCharacter: Character = selectedCharacter.find((x) => x.ownerIP == requestedIP) get
 
-      var associationMap: Map[String, Array[String]] = Map()
+      val characterList: Map[String, Map[String, Array[Byte]]] = Map(requestedCharacter.name -> getCharacterData(requestedCharacter.name))
 
-      selectedCharacter.foreach((x) => associationMap += (x.ownerIP -> Array(x.getType, x.name)) )
+      val associationMap: Map[String, Array[String]] = Map(requestedCharacter.ownerIP -> Array(requestedCharacter.getType, requestedCharacter.name))
+
+      //var characterList: Map[String, Map[String, Array[Byte]]] = Map()
+
+      //selectedCharacter.foreach((x) => characterList += (x.name -> getCharacterData(x.name)) )
+
+      //var associationMap: Map[String, Array[String]] = Map()
+
+      //selectedCharacter.foreach((x) => associationMap += (x.ownerIP -> Array(x.getType, x.name)) )
 
         sender() ! JSONObject(Map[String, Any](
           "object" -> "characterChosen",

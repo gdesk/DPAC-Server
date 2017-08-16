@@ -297,13 +297,20 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       broadcastMessage(ActorsUtils.getSenderIP(message), message.asInstanceOf[JSONObject])
     }
 
-      //send to a client the list of other client for the selected match
-    case "otherPlayerIP" => {
-      //val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
-      println("sending other player IPs")
+    //send to a client the list of other client for the selected match
+    case "playersIP" => {
 
-      sendConfigurationMessage(ActorsUtils.getSenderIP(message), message)
+      val ip: String = ActorsUtils.getSenderIP(message)
+      val otherPlayerIPList: List[String] = getMatchFor(ip).get.involvedPlayerIP
+
+      println("Request for other players IP in match. sending " + otherPlayerIPList.size + " IPs.")
+
+        val reply: JSONObject = JSONObject(Map[String, Any](
+          "object" -> "otherPlayersIP",
+          "list" -> otherPlayerIPList))
+
+        sendRemoteMessage(ActorsUtils.getSenderIP(message), reply)
     }
 
       ///// client bootstrap /////

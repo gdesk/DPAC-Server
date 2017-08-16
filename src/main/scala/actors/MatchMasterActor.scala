@@ -56,6 +56,8 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "startGame" => gameManager ! message
 
+    case "playersIP" => clientMessageDispatcher ! message
+
     case "serverIsRunning" => gameManager ! message
 
     ////// LOCAL MESSAGE HANDLER ////////////////////
@@ -75,8 +77,6 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
     case "AvailablePlaygrounds" => clientMessageDispatcher ! message
 
     case "playgroundChosen" => clientMessageDispatcher ! message
-
-    case "otherPlayerIP" => clientMessageDispatcher ! message
 
     case "clientCanConnect" => clientMessageDispatcher ! message
 

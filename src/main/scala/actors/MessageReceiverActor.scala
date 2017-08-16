@@ -75,6 +75,9 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
         // message received from client when all configuration are completed and the peer need to start
       case "startGame" => matchMaster ! message
 
+        //request for the players IP of the current match
+      case "playersIP" => matchMaster ! message
+
         // message received from client when the peer startup is completed and can start -> when all are ready notify all for match start
       case "serverIsRunning" => matchMaster ! message
 
