@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.{ActorSelection, UntypedAbstractActor}
 import model._
-import utils.ActorsUtils
+import utils.{ActorsUtils, TimerImpl}
 
 import scala.util.parsing.json.JSONObject
 
@@ -149,6 +149,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
           "players" -> selectedMatch.involvedPlayerIP.size ))
         sendNotificationMessage(x,reply)
       })
+
+      if(selectedMatch.readyPlayer >= 3){
+        TimerImpl(this).waitingFor(10000, 5 , selectedMatch)
+      }
     }
 
     case "removePlayerFromMatch" => {
@@ -471,5 +475,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     selected
   }
 
+  def synchroStartMatch(): Unit ={
+    
+  }
 
 }
