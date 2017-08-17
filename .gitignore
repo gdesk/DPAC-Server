@@ -1,5 +1,6 @@
 .idea
-.idea/
+.idea/*
+
 
 # generated image
 src\main\resources\playgroundImages\*

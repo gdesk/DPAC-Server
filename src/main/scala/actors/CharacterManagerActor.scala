@@ -71,32 +71,41 @@ class CharacterManagerActor extends UntypedAbstractActor {
       }
     }
 
+    case "initCharacter" => {
+
+      var associationMap: Map[String, Array[String]] = Map()
+
+      selectedCharacter.foreach(x => associationMap += (x.ownerIP -> Array(x.getType, x.name)))
+
+      println("associationMap size: " + associationMap.size)
+
+      sender() ! JSONObject(Map[String, Any](
+        "object" -> "teamCharacterInit",
+        "typeCharacter" -> associationMap,
+        "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
+    }
+
       // request for the data of other character chosen for the match
     case "teamCharacterRequest" => {
 
       println("Request data for the other characters of the match")
 
       val senderIp: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val requestedIP: String = message.asInstanceOf[JSONObject].obj("requestIP").toString
 
-      val requestedCharacter: Character = selectedCharacter.find((x) => x.ownerIP == requestedIP) get
+      println ("Request from " + senderIp)
+
+      val requestedName: String = message.asInstanceOf[JSONObject].obj("requestIP").toString
+
+      println("Requested data for : " + requestedName )
+
+      val requestedCharacter: Character = selectedCharacter.find((x) => x.name == requestedName) get
 
       val characterList: Map[String, Map[String, Array[Byte]]] = Map(requestedCharacter.name -> getCharacterData(requestedCharacter.name))
-
-      val associationMap: Map[String, Array[String]] = Map(requestedCharacter.ownerIP -> Array(requestedCharacter.getType, requestedCharacter.name))
-
-      //var characterList: Map[String, Map[String, Array[Byte]]] = Map()
-
-      //selectedCharacter.foreach((x) => characterList += (x.name -> getCharacterData(x.name)) )
-
-      //var associationMap: Map[String, Array[String]] = Map()
-
-      //selectedCharacter.foreach((x) => associationMap += (x.ownerIP -> Array(x.getType, x.name)) )
 
         sender() ! JSONObject(Map[String, Any](
           "object" -> "characterChosen",
           "map" -> characterList,
-          "typeCharacter" -> associationMap,
           "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
     }
@@ -176,6 +185,7 @@ class CharacterManagerActor extends UntypedAbstractActor {
   private def getCharacter(characterID :String): Character = {
     val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
 
+
     character.get
   }
 
@@ -183,12 +193,15 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
 
-    if(character.isDefined){
-      character.get.resourceList
-    }
-    else {
-      Map()
-    }
+    println("found character data: " + character.get.name + " ( " + character.get.ownerIP + " ) -> element: " + character.get.resourceList.size)
+
+
+    //if(character.isDefined){
+      return character.get.resourceList
+    //}
+    //else {
+     //  return Map()
+    //}
   }
 
   private def cleanCharacterManager(): Unit = {

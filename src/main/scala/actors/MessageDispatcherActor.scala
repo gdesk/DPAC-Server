@@ -276,6 +276,12 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       sendRemoteMessage(ActorsUtils.getSenderIP(message), message)
     }
 
+    case "teamCharacterInit" => {
+      println("sending character-ip association for this match")
+
+      sendRemoteMessage(ActorsUtils.getSenderIP(message), message)
+    }
+
       // send the list of the available playground
     case "AvailablePlaygrounds" => {
       //val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString

@@ -66,6 +66,8 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
         // todo: da testare
       case "teamCharacterRequest" => matchMaster ! message
 
+      case "initCharacter" => matchMaster ! message
+
         // message received from client when a user want to receive the list of image of available playground
       case "playgrounds" => matchMaster ! message // ok
 
