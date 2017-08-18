@@ -28,8 +28,7 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
   var votedPlayground: Map[Int, mutable.ListBuffer[String]] = Map.empty
 
   var pacmanIP: String = _
-
-  var selectedPlaygroundIndex = -1
+  var selectedPlaygroundIndex: Int = -1
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
