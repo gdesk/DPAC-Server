@@ -101,7 +101,9 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
       val requestedCharacter: Character = selectedCharacter.find((x) => x.name == requestedName) get
 
-      val characterList: Map[String, Map[String, Array[Byte]]] = Map(requestedCharacter.name -> getCharacterData(requestedCharacter.name))
+      val resolution = message.asInstanceOf[JSONObject].obj("resolution").asInstanceOf[String]
+
+      val characterList: Map[String, Map[String, Array[Byte]]] = Map(requestedCharacter.name -> getCharacterDataWithResolution(requestedCharacter.name, resolution))
 
         sender() ! JSONObject(Map[String, Any](
           "object" -> "characterChosen",
@@ -202,6 +204,12 @@ class CharacterManagerActor extends UntypedAbstractActor {
     //else {
      //  return Map()
     //}
+  }
+
+  private def getCharacterDataWithResolution(characterID: String, resolution: String): Map[String,Array[Byte]] = {
+    val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
+    println("found character data: " + character.get.name + " ( " + character.get.ownerIP + " ) -> element: " + character.get.resourceList.size)
+    return character.get.resourceList.filter(k => k._1.contains(resolution))
   }
 
   private def cleanCharacterManager(): Unit = {

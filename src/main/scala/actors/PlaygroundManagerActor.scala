@@ -1,8 +1,11 @@
 package actors
 
 import java.io.File
+import java.nio.file.{Files, Paths}
+
 import akka.actor.UntypedAbstractActor
 import utils.{ActorsUtils, Utils}
+
 import scala.collection.mutable.ListBuffer
 import scala.util.parsing.json.JSONObject
 
@@ -67,13 +70,12 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
         // if everyone has voted send the chosen playground.
       if (currentVoteCount == matchSize){
         println("Selected Playground !")
-        val playground: File = getSelectedPlayground(votedPlayground)
+        val playground: Array[Byte] = getSelectedPlayground(votedPlayground)
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "playgroundChosen",
                     "playground" -> playground ,
                     "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
-        //todo: da testare se la reinizializzazione da problemi
         votedPlayground = new ListBuffer
         currentVoteCount = 0
       }
@@ -101,11 +103,11 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
     fileList
   }
 
-
-  private def getSelectedPlayground(votedPlayground: ListBuffer[Int]): File = {
+  private def getSelectedPlayground(votedPlayground: ListBuffer[Int]): Array[Byte] = {
     val selected: Int = votedPlayground.indexOf(votedPlayground.max)
     //TODO: gestire i pareggi
-    availablePlayground(selected)
+    val file = availablePlayground(selected)
+    Files.readAllBytes(Paths.get(file.getPath))
   }
 
 }

@@ -28,7 +28,7 @@ object Main {
 
     //val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
     val myIP = ActorsUtils.parseIP(NetworkInterface.getByName("wlan1").getInetAddresses.nextElement().toString)
-    println(" -- my IP: " + myIP + " --")
+    println("-- my IP: " + myIP + " --")
 
     val config = ConfigFactory.parseString(
       " akka { \n" +
