@@ -112,6 +112,12 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     }
 
+    case "getPacmanIP" => {
+      val pacman = selectedCharacter.find(x => x.name == "pacman").get
+
+      sender() ! pacman.ownerIP
+    }
+
     case "clear" => {
       //ho finito e quindi reinizializzo le liste ai valori iniziali per poter gestire la prossima partita
       cleanCharacterManager()
