@@ -7,12 +7,10 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
 import akka.actor.UntypedAbstractActor
 import akka.pattern.ask
-import akka.util.Timeout
 import utils.{ActorsUtils, Utils}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Await
 import scala.util.parsing.json.JSONObject
 
 
@@ -124,42 +122,39 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
     votedPlayground.foreach(x => {
       val ipList = x._2
 
-      if(ipList.size == max){
+      if (ipList.size == max) {
         selected += ipList
         max = ipList.size
         playgroundIndex += x._1
       }
 
-      if(ipList.size > max) {
+      if (ipList.size > max) {
         selected = ListBuffer.empty
         playgroundIndex = ListBuffer.empty
-      selected += ipList
-      max = ipList.size
-      playgroundIndex += x._1
-    }}
+        selected += ipList
+        max = ipList.size
+        playgroundIndex += x._1
+      }
+    }
     )
 
-
-
+    //there is a tie
     if (selected.size > 1) {
-
 
       import scala.concurrent.Await
       import akka.util.Timeout
 
       implicit val timeout = Timeout(1000,TimeUnit.MILLISECONDS)
 
-      val result = context.actorSelection("../characterManager") ? JSONObject(Map[String, Any](
-        "object" -> "getPacmanIP"))
+      // ask pattern
+      val result = context.actorSelection("../characterManager") ? JSONObject(Map[String, Any]("object" -> "getPacmanIP"))
 
       Await.result(result, Duration(1000, TimeUnit.MILLISECONDS))
 
       pacmanIP = result.value.get.get.toString
 
       votedPlayground.keySet.foreach(y => {
-        println("playground : " + y)
         if (votedPlayground(y) contains pacmanIP) {
-          println("found pacman vote !")
           selectedPlaygroundIndex = y
         }
       })

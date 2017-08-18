@@ -203,13 +203,8 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
     println("found character data: " + character.get.name + " ( " + character.get.ownerIP + " ) -> element: " + character.get.resourceList.size)
 
+    character.get.resourceList
 
-    //if(character.isDefined){
-      return character.get.resourceList
-    //}
-    //else {
-     //  return Map()
-    //}
   }
 
   private def getCharacterDataWithResolution(characterID: String, resolution: String): Map[String,Array[Byte]] = {
