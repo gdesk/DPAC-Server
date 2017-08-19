@@ -16,6 +16,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
                                                   Range(6,9))
 
   private var waitingMatch: List[Match] = List()
+  private var startedMatch: List[Match] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
@@ -30,7 +31,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     }
 
-      //todo: da testare: controllare se fuzniona la creazione di una nuova quando non lo trova
+      //todo: da testare: controllare se funziona la creazione di una nuova quando non lo trova
     case "selectedRange" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -116,6 +117,22 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       m.get.involvedPlayerIP = currentMatch.involvedPlayerIP
     }
 
+    case "setStartedMatch" => {
+      val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
+
+      println("current match: " + waitingMatch.size)
+
+      println("removing the selected ")
+
+      val selected = waitingMatch.filter(x => x.id == currentMatch.id)
+
+      waitingMatch = waitingMatch.filterNot(x => x.id == currentMatch.id)
+
+      startedMatch = startedMatch ::: selected
+
+      println("current match: " + waitingMatch.size)
+    }
+
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
@@ -134,7 +151,11 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   private def getMatchFor(clientIP: String): Option[Match] = {
 
-    val selected = waitingMatch.find((x) => x.involvedPlayerIP.contains(clientIP))
+    var selected = startedMatch.find((x) => x.involvedPlayerIP.contains(clientIP))
+
+    val waiting = waitingMatch.find((x) => x.involvedPlayerIP.contains(clientIP))
+
+    if ( waiting.isDefined ) selected = waiting
 
     if( selected.isDefined) {
       println("selected match n° " + selected.get.id)
@@ -142,16 +163,6 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     selected
 
-    /*
-    for ( x <- waitingMatch) {
-      val l: List[String] = x.involvedPlayerIP.filter((x) => x == clientIP)
-      if (l.nonEmpty){
-        return Option(x)
-      }
-    }
-    Option.empty[Match]
-
-    */
   }
 }
 

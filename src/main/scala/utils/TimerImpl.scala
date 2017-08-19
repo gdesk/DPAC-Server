@@ -13,7 +13,6 @@ case class TimerImpl(actor: MessageDispatcherActor) {
     println("Timer Started, waiting for " + milliseconds + " milliseconds.")
 
     val max = currentMatch.size.end
-    println("Max Player: " + max )
     new Thread{
       override def run(): Unit = {
         val time = System.currentTimeMillis()
@@ -22,5 +21,4 @@ case class TimerImpl(actor: MessageDispatcherActor) {
       }
     }.start()
   }
-
 }

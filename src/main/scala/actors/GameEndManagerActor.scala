@@ -33,7 +33,7 @@ class GameEndManagerActor extends UntypedAbstractActor {
 
       println(s"Received a new result from $username ")
 
-      context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
+      context.actorSelection("/user/messageReceiver/userMaster/databaseManager") ! JSONObject(Map[String, Any](
         "object" -> "addResult",
         "username" -> username,
         "result" -> matchResult))
@@ -41,5 +41,4 @@ class GameEndManagerActor extends UntypedAbstractActor {
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
-
 }

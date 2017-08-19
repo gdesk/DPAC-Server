@@ -492,6 +492,11 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     currentMatch.involvedPlayerIP.foreach(x => sendNotificationMessage(x, reply))
 
+    println
+    context.actorSelection("/user/messageReceiver/matchMaster/gameConfigurationManager") ! JSONObject(Map[String, Any](
+        "object" -> "setStartedMatch",
+        "match" -> currentMatch ))
+
   }
 
 
