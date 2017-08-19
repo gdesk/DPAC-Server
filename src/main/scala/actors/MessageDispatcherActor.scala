@@ -149,6 +149,10 @@ class MessageDispatcherActor extends UntypedAbstractActor {
           "players" -> selectedMatch.involvedPlayerIP.size ))
         sendNotificationMessage(x,reply)
       })
+
+      if(selectedMatch.involvedPlayerIP.size >= 3){
+        TimerImpl(this).waitingFor(10000 , selectedMatch)
+      }
     }
 
     case "removePlayerFromMatch" => {
@@ -475,6 +479,15 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     }
 
     selected
+  }
+
+  def synchroStartMatch(currentMatch: Match) : Unit ={
+
+    val reply: JSONObject = JSONObject(Map[String, Any](
+      "object" -> "notifyStart" ))
+
+    currentMatch.involvedPlayerIP.foreach(x => sendConfigurationMessage(x, reply))
+
   }
 
 
