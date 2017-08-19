@@ -54,7 +54,7 @@ class MatchMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAb
 
     case "chosenPlayground" => playgroundManager ! message
 
-    case "matchResult" => endGameManager ! message
+    case "saveMatch" => endGameManager ! message
 
     case "startGame" => gameManager ! message
 

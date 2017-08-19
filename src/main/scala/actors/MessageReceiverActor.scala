@@ -84,7 +84,7 @@ class MessageReceiverActor (val messageDispatcher: ActorRef) extends UntypedAbst
       case "serverIsRunning" => matchMaster ! message
 
         // message received from client when the match end -> used to save the result into the database
-      case "matchResult" => matchMaster ! message
+      case "saveMatch" => matchMaster ! message
 
       case _ => println(getSelf() + " received unknown message: " + ActorsUtils.messageType(message))
 

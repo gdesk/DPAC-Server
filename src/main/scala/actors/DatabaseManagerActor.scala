@@ -88,11 +88,11 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
       // request to add a new match result for a player
     case "addResult" => {
-      val user: User = message.asInstanceOf[JSONObject].obj("user").asInstanceOf[User]
+      val username: String = message.asInstanceOf[JSONObject].obj("username").asInstanceOf[String]
       val result: MatchResult = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[MatchResult]
 
-      println(s"add a new result to db: ($result) from $user ")
-      addResult(user.username, new MatchResultImpl())
+      println(s"add a new result to db: ( $result ) from $username ")
+      addResult(username, result)
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
