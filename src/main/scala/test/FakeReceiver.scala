@@ -1,10 +1,13 @@
-import actors.ActorsUtils
+package test
+
 import akka.actor.UntypedAbstractActor
 
 import scala.util.parsing.json.JSONObject
 
-/**
-  * Created by Manuel Bottax on 26/07/2017.
+/** Fake actor for server testing on local machine.
+  * it simply print all the message received, for debugging purpose.
+  *
+  * @author manuBottax.
   */
 class FakeReceiver extends UntypedAbstractActor{
 
@@ -15,7 +18,6 @@ class FakeReceiver extends UntypedAbstractActor{
       println("Received: " + x.toString())
     }
 
-    case x: Boolean => println("Received: " + x)
   }
 
 }

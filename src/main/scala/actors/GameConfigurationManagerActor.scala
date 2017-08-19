@@ -1,41 +1,28 @@
 package actors
 
-import akka.actor.{ActorSelection, Props, UntypedAbstractActor}
+import akka.actor.UntypedAbstractActor
 import model.Match
-
+import utils.ActorsUtils
 import scala.util.parsing.json.JSONObject
 
-/** Actor that manage the people waitnig for a match and the initial configuration of the game.
+/** Actor that manage the people waiting for a match and the initial configuration of the game.
   *
-  *  @author manuBottax
+  * @author manuBottax
   */
 class GameConfigurationManagerActor extends UntypedAbstractActor {
 
-  private def MIN_PLAYER(v: Int): Int = 3 + 2 * v
-  private def MAX_PLAYER(v: Int): Int = 5 + 2 * v
 
-
-
-
-  //todo: controllare se sono i range giusti
-  private val availableRange: List[Range] = List( Range(MIN_PLAYER(0), MAX_PLAYER(0)),  // 3 - 5
-                                                  Range(MIN_PLAYER(1), MAX_PLAYER(1)),  // 5 - 7
-                                                  Range(MIN_PLAYER(2), MAX_PLAYER(2)))  // 7 - 9
+  private val availableRange: List[Range] = List( Range(3,5),
+                                                  Range(6,9))
 
   private var waitingMatch: List[Match] = List()
   private var startedMatch: List[Match] = List()
-
-
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
     case "rangesRequest" => {
 
-      //todo: Controllare quali sono i valori dei range nel client
-
       println("Request for the available ranges")
-
-      //availableRange = getAvailableRanges
 
       sender() ! JSONObject(Map[String, Any](
         "object" -> "ranges",
@@ -54,76 +41,99 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
       val selectedMatch: Option[Match] = getWaitingMatchFor(range) headOption
 
       if (selectedMatch.isDefined){
-        println("Assigned to a match")
-        //TODO: testare se funziona cos' o se devo lavorare sulla lista
-        selectedMatch.get.addPlayer(ip)
-        println("Player in match: " + selectedMatch.get.involvedPlayer.size)
+        if (selectedMatch.get.addPlayer(ip)) {
+          println("Assigned to match n° " + selectedMatch.get.id)
+          println("Player in match: " + selectedMatch.get.involvedPlayerIP.size)
+
+          sender() ! JSONObject(Map[String, Any](
+            "object" -> "newPlayerInMatch",
+            "match" -> selectedMatch.get,
+            "senderIP" -> ip))
+        }
+
+        else{
+          System.err.println(s"Player $ip already in match, cannot add. Assign to a new match.")
+          val current = new Match(List(),range)
+          current.addPlayer(ip)
+
+          println("Assigned to a new match ( n° " + current.id + " )")
+
+          waitingMatch = List(current) ::: waitingMatch
+
+          val selection = context.actorSelection("/user/messageDispatcher")
+
+          selection ! JSONObject(Map[String, Any](
+            "object" -> "removePlayerFromMatch",
+            "match" -> selectedMatch.get,
+            "senderIP" -> ip ))
+
+          selection ! JSONObject(Map[String, Any](
+            "object" -> "newPlayerInMatch",
+            "match" -> current,
+            "senderIP" -> ip ))
+        }
       }
 
       else {
         println("No Available Match for this range, create a new One")
       }
-
     }
 
-    case "startGame" => {
-
-      val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val playerList: List[String] = getMatchFor(senderIP).get.involvedPlayer
-
-
-      sender() ! JSONObject(Map[String, Any](
-        "object" -> "otherPlayerIP",
-        "playerList" -> playerList,
-        "senderIP" -> senderIP))
-    }
-
-
+    // the message sent from client when configuring the P2P communication.
   case "serverIsRunning" => {
 
-  val senderIP: String = message.asInstanceOf[JSONObject].obj ("senderIP").toString
+    val senderIP: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
     val currentMatch: Option[Match] = getMatchFor(senderIP)
 
-    println("Client match found !")
-
-    if(currentMatch.isDefined) {
+    if (currentMatch.isDefined) {
+      println("Client match found !")
       currentMatch.get.addReadyPlayer(senderIP)
 
-      println("Client startup completed !")
+      println("Client P2P startup completed !")
 
       if (currentMatch.get canStart) {
-        println("Client startup completed, can start !")
+        println("All Clients P2P startup completed, game can start !")
         sender() ! JSONObject(Map[String, Any](
           "object" -> "clientCanConnect",
           "senderIP" -> senderIP
         ))
 
+        context.actorSelection("../characterManager") ! JSONObject(Map[String, Any]( "object" -> "clear" ))
       }
     }
 
-  else {
-  println ("MEGAERROREENORME! un Client non connesso sta cercando di iniziare una partita")
-    //throw new MatchNotFoundException
+    else {
+      System.err.println("Error ! non connected client want to start a game ! ")
+    }
   }
 
+      // received when a friend accept a friend request
+    case "updateMatch" =>{
+      val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
+      val m = getMatchFor(currentMatch.involvedPlayerIP.headOption.get)
 
-  }
+      m.get.involvedPlayerIP = currentMatch.involvedPlayerIP
+    }
+
+    case "setStartedMatch" => {
+      val currentMatch: Match = message.asInstanceOf[JSONObject].obj("match").asInstanceOf[Match]
+
+      println("current match: " + waitingMatch.size)
+
+      println("removing the selected ")
+
+      val selected = waitingMatch.filter(x => x.id == currentMatch.id)
+
+      waitingMatch = waitingMatch.filterNot(x => x.id == currentMatch.id)
+
+      startedMatch = startedMatch ::: selected
+
+      println("current match: " + waitingMatch.size)
+    }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
-
-  /*
-  //todo: carica i range disponibili
-  private def getAvailableRanges: List[Range] = {
-    if (availableRange.isEmpty) {
-      availableRange = availableRange  ::: List(new Range(MIN_PLAYER_RANGE_1,MAX_PLAYER_RANGE_1,1))
-    }
-
-    availableRange
-  }
-
-  */
 
 
   private def getWaitingMatchFor(size: Range): List[Match] = {
@@ -131,7 +141,7 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
     val matches: List[Match] = waitingMatch.filter((x) => size == x.size)
 
     if (matches.isEmpty) {
-      waitingMatch = waitingMatch ::: List(new Match(List(),size))
+      waitingMatch = List(new Match(List(),size)) ::: waitingMatch
       return waitingMatch
     }
 
@@ -140,43 +150,19 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
   private def getMatchFor(clientIP: String): Option[Match] = {
 
-    for ( x <- waitingMatch) {
-      val l: List[String] = x.involvedPlayer.filter((x) => x == clientIP)
-      if (l.nonEmpty){
-        return Option(x)
-      }
-    }
-    Option.empty[Match]
-  }
+    var selected = startedMatch.find((x) => x.involvedPlayerIP.contains(clientIP))
 
-  private def getMatch(id:Int): Option[Match] = {
+    val waiting = waitingMatch.find((x) => x.involvedPlayerIP.contains(clientIP))
 
-    val waiting: Option[Match] = waitingMatch.find((x) => x.id == id)
+    if ( waiting.isDefined ) selected = waiting
 
-    val started: Option[Match] = startedMatch.find((x) => x.id == id)
-
-    if ( waiting.isDefined) {
-      return waiting
+    if( selected.isDefined) {
+      println("selected match n° " + selected.get.id)
     }
 
-    else if (started.isDefined){
-      return started
-    }
+    selected
 
-    Option.empty[Match]
   }
-
-  private def getWaitingMatch: List[Match] = {
-    waitingMatch
-  }
-
-  private def startMatch( selected: Match): Unit = {
-    waitingMatch = waitingMatch.filter((x) => x != selected)
-    startedMatch = startedMatch ::: List(selected)
-  }
-
-
-
 }
 
 

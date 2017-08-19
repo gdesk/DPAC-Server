@@ -1,25 +1,32 @@
 package actors
 
 import akka.actor.{ActorRef, Props, UntypedAbstractActor}
-import model.{Client, ClientImpl}
+import utils.ActorsUtils
 
 import scala.util.parsing.json.JSONObject
 
+/** An actor that handle the user-related message and dispatch it to the various actor.
+  * It also initialize the user-related actors.
+  *
+  * @param clientMessageDispatcher: a reference to the actor that dispatch message to the remote client.
+  *
+  * @author manuBottax
+  */
 class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbstractActor{
 
   var databaseManager: ActorRef = _
   var loginManager: ActorRef = _
   var registrationManager: ActorRef = _
-  //var clientManager: ActorRef = _
 
   override def preStart(): Unit = {
 
     databaseManager = context.actorOf(Props[DatabaseManagerActor] , "databaseManager")
+    println("[ Database manager actor creation completed ]")
     loginManager = context.actorOf(Props[LoginManagerActor], "loginManager")
+    println("[ Login manager actor creation completed ]")
     registrationManager = context.actorOf(Props[RegistrationManagerActor] , "registrationManager")
-    //clientManager = context.actorOf(Props[ClientManagerActor], "clientManager")
+    println("[ Registration manager actor creation completed ]")
 
-    super.preStart()
   }
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
@@ -36,6 +43,7 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
     case "registrationResult" => clientMessageDispatcher ! message
 
+      // login result handler
     case "loginResult" => {
       val result: String = message.asInstanceOf[JSONObject].obj("result").toString
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
@@ -45,12 +53,9 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
 
         case "success" => {
 
-          val client: Client = new ClientImpl(ip, username)
-
-          //todo: manda al client message dispatcher
           clientMessageDispatcher ! JSONObject(Map[String, Any](
                     "object" -> "addOnlinePlayer",
-                    "player" -> client,
+                    "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
                     "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
           println(s"Player $username connected from $ip !" )
@@ -70,15 +75,10 @@ class UserMasterActor (val clientMessageDispatcher: ActorRef) extends UntypedAbs
       }
     }
 
-      ////////// /////////////////////
-
     case "previousMatchResult" => clientMessageDispatcher ! message
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
-
-
   }
-
 }
 
 object UserMasterActor {
@@ -90,5 +90,4 @@ object UserMasterActor {
     * @return a Props for creating this actor.
     */
   def props(clientMessageDispatcher: ActorRef): Props = Props(new UserMasterActor(clientMessageDispatcher))
-
 }

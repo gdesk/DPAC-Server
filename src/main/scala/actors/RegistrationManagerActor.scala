@@ -1,7 +1,9 @@
 package actors
 
-import akka.actor.{ActorRef, Props, UntypedAbstractActor}
+import akka.actor.UntypedAbstractActor
 import model.{ImmutableUser, User}
+import utils.ActorsUtils
+
 import scala.util.parsing.json.JSONObject
 
 /** Actor that manage the registration of a new user user.
@@ -13,6 +15,7 @@ class RegistrationManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
+      // a new user want to register from a remote client
     case "newUser" => {
 
       println("A new user want to register !")
@@ -21,58 +24,28 @@ class RegistrationManagerActor extends UntypedAbstractActor {
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val email: String = message.asInstanceOf[JSONObject].obj("email").toString
       val password: String = message.asInstanceOf[JSONObject].obj("password").toString
-      //val ip: String = ActorsUtils.parseIP(message.asInstanceOf[JSONObject].obj("senderIP").toString)
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-
 
       val user: User = new ImmutableUser(name, username, password, email)
 
       pendingUser = pendingUser ::: List(user)
 
-      context.actorSelection("../databaseManager") ! JSONObject( Map[String, String](
-                          "object" -> "checkUsername",
-                          "username" -> username,
-                          "senderIP" -> ip ))
+        // send a request to the database manager for adding the new user.
+      context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
+        "object" -> "addUserToDB",
+        "user" -> user,
+        "senderIP" -> ip ))
     }
 
-    case "usernameCheckResult" => {
-
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
-      val result: String = message.asInstanceOf[JSONObject].obj("result").toString
-
-      val currentUser: Option[User] = pendingUser.find((x) => x.username == username)
-
-      if (currentUser.isDefined) {
-        result match {
-
-          case "success" => {
-
-            context.actorSelection("../databaseManager") ! JSONObject(Map[String, Any](
-              "object" -> "addUserToDB",
-              "user" -> currentUser.get,
-              "senderIP" -> ip))
-          }
-
-          case _ => self ! JSONObject(Map[String, Any](
-              "object" -> "registrationResult",
-              "result" -> "failure",
-              "senderIP" -> ip))
-        }
-      }
-    }
-
+      //handle the result from the database manager and notify it to the client
     case "registrationResult" => {
-
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val result: String = message.asInstanceOf[JSONObject].obj("result").toString
 
-
       val currentUser: Option[User] = pendingUser.find((x) => x.username == username)
 
       if (currentUser.isDefined) {
-
         pendingUser = pendingUser.filter( _ != currentUser.get)
         result match {
 
@@ -96,9 +69,6 @@ class RegistrationManagerActor extends UntypedAbstractActor {
       }
     }
 
-      //todo: solo lo username deve essere univoco e controllato ?
-
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
-
 }

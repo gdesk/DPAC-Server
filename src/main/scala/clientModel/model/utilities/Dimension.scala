@@ -1,6 +1,6 @@
 package clientModel.model.utilities
 
-/** The dimension of an Item in the playground.
+/** The dimension of an item in the playground.
   *
   * @constructor create a new Dimension object.
   * @param x the dimension of the item on x axis.
@@ -8,5 +8,5 @@ package clientModel.model.utilities
   *
   * @author manuBottax
   */
-case class Dimension (val x: Int, val y: Int)
+case class Dimension (x: Int, y: Int)
 

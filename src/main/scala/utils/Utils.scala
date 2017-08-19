@@ -1,21 +1,20 @@
 package utils
 
-import java.awt.{Color, Image, Toolkit}
-import java.io.File
+import java.awt.image.BufferedImage
+import java.awt.{Image, Toolkit}
+import java.io.{ByteArrayOutputStream, File}
 import java.net.URL
-import javax.swing.{ImageIcon, JComponent, JFrame}
+import javax.imageio.ImageIO
+import javax.swing.{ImageIcon, JFrame, JPanel}
 
-import actors.ActorsUtils
 import clientModel.model.Playground
-import view.view.playground.{PlaygroundBuilderImpl, PlaygroundPanel, PlaygroundSettings, PlaygroundView}
-import view.view.utils.ImagesResolutions
+import clientModel.view.MicroMapPanel
 
-/**
-  * Created by chiaravarini on 01/07/17.
+/** Various utils for image and collection handling.
+  *
+  * @author chiaravarini and manuBottax.
   */
 object Utils {
-
-
 
   val IMAGES_BASE_PATH = "/characters/"
   val IMAGES_EXTENSION = ".png"
@@ -31,7 +30,7 @@ object Utils {
     new ImageIcon(getResource("/images/" + path + ".png")).getImage
   }
 
-  def getResolution(): ImagesResolutions =  Toolkit.getDefaultToolkit().getScreenResolution() match{
+  def getResolution: ImagesResolutions =  Toolkit.getDefaultToolkit.getScreenResolution match{
     case x if x < 50 =>  ImagesResolutions.RES_24
     case x if x >= 50 && x < 100 =>  ImagesResolutions.RES_32
     case x if x >= 100 && x < 150 =>  ImagesResolutions.RES_48
@@ -55,43 +54,73 @@ object Utils {
     map.asScala
   }
 
-  def getImageForPlayground(playgroundFile: File): Array[Byte] = {
+  /** Get a byte array from a playground file.
+    * the playground file is transformed into an image and then in a byte array in order to send it through the net.
+    * It also save the image into the local file system.
+    *
+    * @param playgroundFile: the file to be loaded
+    * @return the byte array corresponding to the image of the playground.
+    */
+  def getByteArrayFromPlayground(playgroundFile: File): Array[Byte] = {
 
     val playground: Playground = IOUtils.getPlaygroundFromFile(playgroundFile)
 
-    val view: PlaygroundPanel = new PlaygroundPanel(new PlaygroundSettings(70,30))
+    val cellRowsSize: Int = 16
+    val cellColsSize: Int = 12
 
-    view.renderBlockList(Utils.getJavaList(playground.blocks))
-    view.renderEatableList(Utils.getJavaList(playground.eatables))
+    val view: MicroMapPanel = new MicroMapPanel(playground)
 
-    val f: JFrame = new JFrame("test")
-    f.setSize(1024,1024)
-    f.add(view, 0)
+    view.setSize(playground.dimension.x * cellColsSize, playground.dimension.y * cellRowsSize)
+
+    val f: JFrame = new JFrame("New Playground Image")
+    f.setSize(playground.dimension.x * cellColsSize, playground.dimension.y * cellRowsSize)
+    f.setContentPane(view)
     f.setVisible(true)
 
-    saveComponentAsJPEG(view, "" + playgroundFile.getName + ".jpg" )
+    val path: String = "src/main/resources/playgroundImages/"
 
-    val playgroundImage: Image = new ImageIcon("playgroundImages/" + playgroundFile.getName + ".jpg").getImage
+    val dir: File = new File (path)
+    dir.mkdir()
 
-    ActorsUtils.toByteArray(playgroundImage)
+    saveComponentAsJPEG(view, f, path + playgroundFile.getName + ".jpg")
+
+    val playgroundImage: Image = new ImageIcon(path + playgroundFile.getName + ".jpg").getImage
+
+    toByteArray(playgroundImage)
 
   }
 
-  private def saveComponentAsJPEG(myComponent: JComponent, filename: String): Unit = {
+  /** Convert an Image to a byte array.
+    *
+    * @param source: the image
+    * @return the corresponding byte array.
+    */
+  def toByteArray(source: Image): Array[Byte] = {
+    var imageInByte: Array[Byte] = Array()
+
+    val originalImage = toBufferedImage(source)
+
+    val outputStream = new ByteArrayOutputStream()
+    ImageIO.write(originalImage, "png", outputStream)
+    outputStream.flush()
+    imageInByte = outputStream.toByteArray
+    outputStream.close()
+
+    imageInByte
+  }
+
+  private def saveComponentAsJPEG(myComponent: JPanel, frame: JFrame, filename: String): Unit = {
 
   import java.awt.image.BufferedImage
   import java.io.FileOutputStream
   import com.sun.image.codec.jpeg.JPEGCodec
 
-    //myComponent.setBackground(Color.white)
-
     val size = myComponent.getSize()
 
-    if(myComponent == null ) println("ERROEREOROROOER")
-    println("ok")
-    val myImage = new BufferedImage(size.width,size.height, BufferedImage.TYPE_INT_RGB)
+    val myImage = new BufferedImage(size.getWidth.toInt,size.getHeight.toInt, BufferedImage.TYPE_INT_RGB)
     val g2 = myImage.createGraphics
     myComponent.paint(g2)
+
     try {
       val out = new FileOutputStream(filename)
       val encoder = JPEGCodec.createJPEGEncoder(out)
@@ -101,5 +130,21 @@ object Utils {
       case e: Exception =>
         System.out.println(e)
     }
+
+    frame.dispose()
   }
+
+  private def toBufferedImage(src: Image): BufferedImage = {
+
+    val w = src.getWidth(null)
+    val h = src.getHeight(null)
+    val `type` = BufferedImage.TYPE_INT_ARGB
+
+    val dest = new BufferedImage(w,h,`type`)
+    val g2 = dest.createGraphics
+    g2.drawImage(src, 0, 0, null)
+    g2.dispose()
+    dest
+  }
+
 }

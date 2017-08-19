@@ -1,16 +1,12 @@
 package actors
 
-import java.awt.Image
-import java.awt.image.BufferedImage
-import java.io.{File, FileOutputStream}
-
+import java.io.File
 import akka.actor.UntypedAbstractActor
-import utils.{Direction, Utils}
+import utils.{ActorsUtils, Direction}
 import model.Character
-
 import scala.util.parsing.json.JSONObject
 
-/** Actor that manage the choice of a character for the match.
+/** Actor that manage the choice of characters for the match.
   *
   *  @author manuBottax
   */
@@ -18,18 +14,20 @@ class CharacterManagerActor extends UntypedAbstractActor {
 
   val playableCharacter: List[Character] = getPlayableCharacters
   var availableCharacter: List[Character] = playableCharacter
+  var selectedCharacter: List[Character] = List()
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
+      // request for the list of available characters.
     case "characterToChooseRequest"  => {
 
-      println("Request for the available character")
+      println("Request for the available characters")
 
       println("Now available: " + availableCharacter.size)
 
-      var retList: Map[String,File] = Map()
+      var retList: Map[String,Array[Byte]] = Map()
 
-      availableCharacter.foreach( (x) => retList += ((x.name, x.characterImage)) )
+      availableCharacter.foreach( (x) => retList += ((x.name, x.characterMainImage)) )
 
       sender() ! JSONObject(Map[String, Any](
                 "object" -> "characterToChoose",
@@ -37,22 +35,26 @@ class CharacterManagerActor extends UntypedAbstractActor {
                 "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
     }
 
-      //dico al client se è disponibile e a tutti gli altri dico che è stato scelto
+      //tell the client if the character chosen is available. if it is, it is assigned to the client and other client for the match are notified.
     case "chooseCharacter" => {
 
       val characterID: String = message.asInstanceOf[JSONObject].obj("character").toString
+      val senderIp: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
 
       println(s"Request if the character $characterID is available ")
 
-      if (isAvailable(characterID)) {
+      if (isAvailable(characterID, senderIp)) {
 
         val character: Map[String,Array[Byte]] = getCharacterData(characterID)
+
+        selectedCharacter = selectedCharacter ::: List(getCharacter(characterID))
 
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "availableCharacter",
                     "available" -> true ,
                     "map" -> character,
                     "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
         sender() ! JSONObject(Map[String, Any](
                     "object" -> "notifySelection",
                     "character" -> characterID,
@@ -67,60 +69,100 @@ class CharacterManagerActor extends UntypedAbstractActor {
       }
     }
 
-    case "choosenCharacter" => println("ti devo inviare il pacchetto completo del personaggio")
+    case "initCharacter" => {
+
+      var associationMap: Map[String, Array[String]] = Map()
+
+      selectedCharacter.foreach(x => associationMap += (x.ownerIP -> Array(x.getType, x.name)))
+
+      println("associationMap size: " + associationMap.size)
+
+      sender() ! JSONObject(Map[String, Any](
+        "object" -> "teamCharacterInit",
+        "typeCharacter" -> associationMap,
+        "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
+    }
+
+      // request for the data of other character chosen for the match
+    case "teamCharacterRequest" => {
+
+      println("Request data for the other characters of the match")
+
+      val senderIp: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
+
+      println ("Request from " + senderIp)
+
+      val requestedName: String = message.asInstanceOf[JSONObject].obj("requestIP").toString
+
+      println("Requested data for : " + requestedName )
+
+      val requestedCharacter: Character = selectedCharacter.find((x) => x.name == requestedName) get
+      val resolution = message.asInstanceOf[JSONObject].obj("resolution").asInstanceOf[String]
+      val characterList: Map[String, Map[String, Array[Byte]]] = Map(requestedCharacter.name -> getCharacterDataWithResolution(requestedCharacter.name, resolution))
+
+        sender() ! JSONObject(Map[String, Any](
+          "object" -> "characterChosen",
+          "map" -> characterList,
+          "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
+
+    }
+
+    case "getPacmanIP" => {
+      val pacman = selectedCharacter.find(x => x.name == "pacman").get
+
+      sender() ! pacman.ownerIP
+    }
+
+    case "clear" => {
+      //ho finito e quindi reinizializzo le liste ai valori iniziali per poter gestire la prossima partita
+      cleanCharacterManager()
+    }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
-  //todo: Questa lista in un futuro aggiornamento cambierà da utente a utente a seconda di cosa ha sbloccato un giocatore
+  //todo: Questa lista in un futuro aggiornamento cambierà da utente a utente a seconda di cosa ha sbloccato un giocatore e letta in automatico
   private def getPlayableCharacters: List[Character] = {
 
-
-    //TODO: Andrà letta dal database !!!!
-
+    //load all the character resources file:
     var charResList: List[Character] = List()
-
     val pacman: Character = new Character("pacman")
 
-    var basePath: String = "src/main/resources/characters/"
+    val basePath: String = "src/main/resources/characters/"
 
-
-    //todo: leggere i file.......
     for( x <- Direction.values()){
+      val path24: String = pacman.name.toLowerCase +"/24x24"
+      pacman.addResource(new File(basePath + path24 + "/" + x.getDirection + ".png"))
 
-      var path24: String = pacman.name.toLowerCase +"/24x24"
-      val f: File = new File(basePath + path24 + "/" + x.getDirection + ".png")
-      println(f.length())
-      pacman.addImage(f)
+      val path32: String = pacman.name.toLowerCase +"/32x32"
+      pacman.addResource(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
-      var path32: String = pacman.name.toLowerCase +"/32x32"
-      pacman.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
+      val path48: String = pacman.name.toLowerCase +"/48x48"
+      pacman.addResource(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
-      var path48: String = pacman.name.toLowerCase +"/48x48"
-      pacman.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
-
-      var path128: String = pacman.name.toLowerCase +"/128x128"
-      pacman.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
+      val path128: String = pacman.name.toLowerCase +"/128x128"
+      pacman.addResource(new File(basePath + path128 + "/" + x.getDirection + ".png"))
     }
 
     charResList = charResList ::: List (pacman)
 
     for (y <- List("blue", "pink", "red", "yellow")) {
 
-      var ghost: Character = new Character(y)
+      val ghost: Character = new Character(y)
 
       for (x <- Direction.values()) {
-        var path24: String = "ghosts/" + ghost.name.toLowerCase + "/24x24/"
-        ghost.addImage(new File(basePath + path24 + "/" + x.getDirection + ".png"))
+        val path24: String = "ghosts/" + ghost.name.toLowerCase + "/24x24/"
+        ghost.addResource(new File(basePath + path24 + "/" + x.getDirection + ".png"))
 
-        var path32: String = "ghosts/" + ghost.name.toLowerCase + "/32x32/"
-        ghost.addImage(new File(basePath + path32 + "/" + x.getDirection + ".png"))
+        val path32: String = "ghosts/" + ghost.name.toLowerCase + "/32x32/"
+        ghost.addResource(new File(basePath + path32 + "/" + x.getDirection + ".png"))
 
-        var path48: String = "ghosts/" + ghost.name.toLowerCase + "/48x48/"
-        ghost.addImage(new File(basePath + path48 + "/" + x.getDirection + ".png"))
+        val path48: String = "ghosts/" + ghost.name.toLowerCase + "/48x48/"
+        ghost.addResource(new File(basePath + path48 + "/" + x.getDirection + ".png"))
 
-        var path128: String = "ghosts/" + ghost.name.toLowerCase + "/128x128/"
-        ghost.addImage(new File(basePath + path128 + "/" + x.getDirection + ".png"))
+        val path128: String = "ghosts/" + ghost.name.toLowerCase + "/128x128/"
+        ghost.addResource(new File(basePath + path128 + "/" + x.getDirection + ".png"))
       }
 
       charResList = charResList ::: List (ghost)
@@ -129,27 +171,45 @@ class CharacterManagerActor extends UntypedAbstractActor {
     charResList
   }
 
-  private def isAvailable(characterID :String): Boolean = {
+  private def isAvailable(characterID :String, ownerIP: String): Boolean = {
     val character: Option[Character] = availableCharacter.find((x) => x.name == characterID)
 
     if (character.isDefined){
       availableCharacter = availableCharacter.filterNot((x) => x.name == characterID)
+      // assign the character to the player that has choose it.
+      character.get.ownerIP = ownerIP
       return true
     }
 
     false
   }
 
+  private def getCharacter(characterID :String): Character = {
+    val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
+
+
+    character.get
+  }
+
   private def getCharacterData(characterID: String): Map[String,Array[Byte]] = {
 
     val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
 
-    if(character.isDefined){
+    println("found character data: " + character.get.name + " ( " + character.get.ownerIP + " ) -> element: " + character.get.resourceList.size)
 
-      return character.get.imageList
-    }
+    character.get.resourceList
 
-    Map()
+  }
+
+  private def getCharacterDataWithResolution(characterID: String, resolution: String): Map[String,Array[Byte]] = {
+    val character: Option[Character] = playableCharacter.find((x) => x.name == characterID)
+    println("found character data: " + character.get.name + " ( " + character.get.ownerIP + " ) -> element: " + character.get.resourceList.size)
+    character.get.resourceList.filter(k => k._1.contains(resolution))
+  }
+
+  private def cleanCharacterManager(): Unit = {
+    selectedCharacter = List()
+    availableCharacter = playableCharacter
   }
 
 }

@@ -1,6 +1,7 @@
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 x                                                          x
 x                                                          x
+x                                                          x
 x ...................p.......p......p.........p..........  x
 x                                                          x
 x xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx x
@@ -12,7 +13,7 @@ x                                                          x
 x                        c s o                             x
 x                                                          x
 x xxxxxxxxxxxxxxxxxxx              xxxxxxxxxxxxxxxxxxx     x
-x                        a                                 x
+x                         a h                              x
 x                                                          x
 x                                                          x
 x               xxxxxxxxxxxxxxxxxxx                        x

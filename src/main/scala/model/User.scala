@@ -1,7 +1,9 @@
 package model
 
-/**
-  * Created by Manuel Bottax on 15/07/2017.
+/** A User of the game.
+  * It Identify a single player.
+  *
+  * @author manuBottax
   */
 trait User {
 
@@ -12,6 +14,10 @@ trait User {
 
 }
 
+/** A simple implementation of [[User]] that cannot modify its information.
+  *
+  * @author manuBottax
+  */
 class ImmutableUser (override val name: String,
                      override val username: String,
                      override val password: String,

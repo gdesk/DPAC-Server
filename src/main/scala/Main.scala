@@ -1,157 +1,170 @@
-import java.io.File
-import java.net.InetAddress
 
-import actors.{ActorsUtils, MessageDispatcherActor, MessageReceiverActor}
+import java.net.{InetAddress, NetworkInterface}
+import java.util
+
+import actors.{MessageDispatcherActor, MessageReceiverActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
-import com.typesafe.config.{ConfigFactory, ConfigResolveOptions}
+import com.typesafe.config.ConfigFactory
+import utils.ActorsUtils
 
-import scala.util.parsing.json.JSONObject
-
-/**
-  * Created by Manuel Bottax on 15/07/2017.
+/** The main class for the server application.
+  * It configure the server and start actors system.
+  *
+  * @author manuBottax
   */
 object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val config = ConfigFactory.parseFile(new File("src/dpacServer.conf"))
-    //val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
-    //config.resolve()
-    /*val config = ConfigFactory.parseString(
-      " akka { " +
-        " actor {" +
-          " provider = remote" +
-        "}" +
-        " remote { " +
-          " enabled-transports = [\"akka.remote.netty.tcp\"]" +
-          " netty.tcp { " +
-            " hostname = \"" + ActorsUtils.parseIP(InetAddress.getLocalHost.toString) +"\"" +
-            " port = 2552" +
-          "}" +
-        "}" +
-      "}")
-      */
+    println("[ DPACS - Distributed Pacman Server ]")
+    println("[ Version 1.0.0 - August 2017 ]")
+    println()
+    println("[ Project for Software System Development course @ Unibo - Ingegneria e Scienze Informatiche - A.Y. 2016/17 ]")
+    println("[ Developed by Manuel Bottazzi, Giulia Lucchi, Federica Pecci, Margherita Pecorelli & Chiara Varini ]")
+    println()
 
+    println("-- Server configuration and startup --")
+    println()
+
+    //val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
+    val myIP = ActorsUtils.parseIP(NetworkInterface.getByName("wlan1").getInetAddresses.nextElement().toString)
+    println("-- my IP: " + myIP + " --")
+
+    val config = ConfigFactory.parseString(
+      " akka { \n" +
+        " actor { \n" +
+          " provider = remote\n" +
+          "}\n" +
+        " remote { \n" +
+          " enabled-transports = [\"akka.remote.netty.tcp\"]\n" +
+          " netty.tcp { \n" +
+            " hostname = \"" + myIP +"\"\n" +
+            " port = 2552\n" +
+          "}\n" +
+        "}\n" +
+      "}\n")
 
     val system = ActorSystem.create("DpacServer", config)
 
+    println()
+    println("-- Actors creation --")
+    println()
+
     val messageDispatcher: ActorRef = system actorOf(Props[MessageDispatcherActor] , "messageDispatcher")
+    println("[ Message dispatcher actor creation completed ]")
     val messageReceiver: ActorRef = system actorOf(MessageReceiverActor.props(messageDispatcher) , "messageReceiver")
+    println("[ Message receiver actor creation completed ]")
 
-
-/*
-
-    //test manuale
-    messageReceiver ! JSONObject(Map[String, String](
-          "object" -> "newUser",
-          "name" -> "testUser",
-          "username" -> "myUserName",
-          "email" -> "me@mail.com",
-          "password" -> "pswd",
-          "senderIP" -> "127.0.0.1"
-        ))
-
-
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName2",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName3",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "login",
-      "username" -> "myUserName4",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
 
     /*
-    messageReceiver ! JSONObject(Map[String, String](
-      "object" -> "playgrounds",
-      "username" -> "myUserName4",
-      "password" -> "pswd",
-      "senderIP" -> "127.0.0.1"
-    ))
+
+            //test manuale
+            messageReceiver ! JSONObject(Map[String, String](
+                  "object" -> "newUser",
+                  "name" -> "testUser",
+                  "username" -> "myUserName",
+                  "email" -> "me@mail.com",
+                  "password" -> "pswd",
+                  "senderIP" -> "127.0.0.1"
+                ))
 
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "chosenPlayground",
-      "playground" -> 1,
-      "playersNumber" -> 2,
-      "senderIP" -> "127.0.0.1"
-    ))
+            messageReceiver ! JSONObject(Map[String, String](
+              "object" -> "login",
+              "username" -> "myUserName",
+              "password" -> "pswd",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, String](
+              "object" -> "login",
+              "username" -> "myUserName2",
+              "password" -> "pswd",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, String](
+              "object" -> "login",
+              "username" -> "myUserName3",
+              "password" -> "pswd",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, String](
+              "object" -> "login",
+              "username" -> "myUserName4",
+              "password" -> "pswd",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, String](
+              "object" -> "playgrounds",
+              "username" -> "myUserName4",
+              "password" -> "pswd",
+              "senderIP" -> "127.0.0.1"
+            ))
 
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "chosenPlayground",
-      "playground" -> 2,
-      "playersNumber" -> 2,
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    */
-
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "selectedRange",
-      "range" -> Range(1,5),
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "selectedRange",
-      "range" -> Range(1,5),
-      "senderIP" -> "127.0.0.1"
-    ))
-
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "selectedRange",
-      "range" -> Range(1,5),
-      "senderIP" -> "127.0.0.1"
-    ))
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "chosenPlayground",
+              "playground" -> 1,
+              "senderIP" -> "127.0.0.1"
+            ))
 
 
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "chosenPlayground",
+              "playground" -> 2,
+              "senderIP" -> "127.0.0.1"
+            ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "startGame",
-      "senderIP" -> "127.0.0.1"
-    ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "selectedRange",
+              "range" -> Range(1,5),
+              "senderIP" -> "127.0.0.1"
+            ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "selectedRange",
+              "range" -> Range(1,5),
+              "senderIP" -> "127.0.0.1"
+            ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "selectedRange",
+              "range" -> Range(1,5),
+              "senderIP" -> "127.0.0.1"
+            ))
 
-    messageReceiver ! JSONObject(Map[String, Any](
-      "object" -> "serverIsRunning",
-      "senderIP" -> "127.0.0.1"
-    ))
 
-    */
+
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "startGame",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "serverIsRunning",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "serverIsRunning",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "serverIsRunning",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            messageReceiver ! JSONObject(Map[String, Any](
+              "object" -> "serverIsRunning",
+              "senderIP" -> "127.0.0.1"
+            ))
+
+            */
 
   }
 }

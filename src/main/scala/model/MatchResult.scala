@@ -21,7 +21,7 @@ def date: Calendar
 def date_=(date: Calendar): Unit
 }
 
-/** A simple implementation of [MatchResult]
+/** A simple implementation of [[MatchResult]]
 *
 * @constructor create the result
 *

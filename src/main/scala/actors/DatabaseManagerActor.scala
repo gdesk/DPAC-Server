@@ -1,9 +1,9 @@
 package actors
 
-import java.util.Calendar
-
 import akka.actor.UntypedAbstractActor
+import database.DatabaseQuery
 import model.{MatchResult, MatchResultImpl, User}
+import utils.ActorsUtils
 
 import scala.util.parsing.json.JSONObject
 
@@ -13,34 +13,9 @@ import scala.util.parsing.json.JSONObject
   */
 class DatabaseManagerActor extends UntypedAbstractActor {
 
-  //todo: questo attore interagisce con il db e mi restituisce informazioni sugli utenti => probabilmente servirà un parametro
-
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    case "checkUsername" => {
-
-      val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
-      val username: String = message.asInstanceOf[JSONObject].obj("username").toString
-
-      if (  checkAvailableUsername(username) ) {
-
-        sender() ! JSONObject(Map[String, String](
-          "object" -> "usernameCheckResult",
-          "username" -> username,
-          "result" -> "success",
-          "senderIP" -> ip))
-      }
-
-      else {
-
-        sender() ! JSONObject(Map[String, String](
-          "object" -> "usernameCheckResult",
-          "username" -> username,
-          "result" -> "fail",
-          "senderIP" -> ip))
-      }
-    }
-
+      // request to add a new user to the database
     case "addUserToDB" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -48,6 +23,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
       if( addUserToDB(user) ) {
 
+        println("User correctly added to database.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "registrationResult",
           "username" -> user.username,
@@ -57,15 +33,16 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
       else {
 
+        System.err.println("Error: User not added to the database.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "registrationResult",
           "username" -> user.username,
           "result" -> "fail",
           "senderIP" -> ip))
       }
-
     }
 
+      // request to check login information
     case "checkUsernameAndPassword" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString
@@ -74,6 +51,7 @@ class DatabaseManagerActor extends UntypedAbstractActor {
 
       if( checkLoginInfo(username, password) ) {
 
+        println("User login info are correct.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "checkLoginInfoResult",
           "result" -> "success",
@@ -82,63 +60,104 @@ class DatabaseManagerActor extends UntypedAbstractActor {
       }
 
       else{
-
+        System.err.println("Error: Wrong login info.")
         sender() ! JSONObject(Map[String, String](
           "object" -> "checkLoginInfoResult",
           "result" -> "fail",
           "username" -> username,
           "senderIP" -> ip))
       }
-
     }
 
-
+      // request for the previous match result for a player -> message received after the player login
     case "getPreviousMatchResult" => {
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
-      //todo: dovrebbe essere una list
       val resultList: Option[List[Map[String, Any]]] = getMatchResultFor(username)
 
-      // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      //Ho un'idea per gestire la sincronizzazione ! si fa una lista di pending come di la, quando arriva il messaggio si lancia il metodo
-      // e il metodo stesso invia un messaggio a self quando ha finito, dicendo che è prnoto il risultato, e a quel punto viene gestito quel messaggio
-      // e risponde a quello che ha ricevuto  il messaggio.
-
-        context.parent ! JSONObject(Map[String, Any](
-                                  "object" -> "previousMatchResult",
-                                  "list" -> resultList,
-                                  "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString  ))
+      context.parent ! JSONObject(Map[String, Any](
+                       "object" -> "previousMatchResult",
+                       "list" -> resultList,
+                       "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString))
     }
 
+      // request for the previous match result for a player -> use the previous message handler
     case "allMatchResult" => self ! JSONObject(Map[String, Any](
           "object" -> "getPreviousMatchResult",
           "username" -> message.asInstanceOf[JSONObject].obj("username").toString,
           "senderIP" -> message.asInstanceOf[JSONObject].obj("senderIP").toString ))
 
-      //todo: gestire match result con il model del client
+      // request to add a new match result for a player
     case "addResult" => {
-      val user: User = message.asInstanceOf[JSONObject].obj("user").asInstanceOf[User]
+      val username: String = message.asInstanceOf[JSONObject].obj("username").asInstanceOf[String]
       val result: MatchResult = message.asInstanceOf[JSONObject].obj("result").asInstanceOf[MatchResult]
 
-      println(s"add a new result to db: ($result) from $user ")
-      addResult(user, new MatchResultImpl())
+      println(s"add a new result to db: ( $result ) from $username ")
+      addResult(username, result)
     }
 
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
-  //todo
-  private def getMatchResultFor(username: String): Option[List[Map[String, Any]]] = Option(List(Map ("result" -> true,"score" -> 42, "date" -> Calendar.getInstance())))
+  private def getMatchResultFor(username: String): Option[List[Map[String, Any]]] = {
+    try {
+      val results: List[MatchResult] = DatabaseQuery.allMatches(username)
+      var list: List[Map[String, Any]] = List()
 
-  //todo
-  private def checkAvailableUsername(username: String): Boolean = true
+      results.foreach((x) => {
+        val result: Map[String, Any] = Map("result" -> x.result, "score" -> x.score, "date" -> x.date)
+        list = list ::: List(result)
+      })
 
-  //todo
-  private def addUserToDB(user: User): Boolean = true
+      Option(list)
+    }
+    catch {
+      case e: ExceptionInInitializerError => {
+        println("Database not initialized ! Open DB connection")
+        Option.empty[List[Map[String, Any]]]
+      }
+    }
+  }
 
-  //Todo
-  private def checkLoginInfo(username: String, password: String): Boolean = true
+  private def addUserToDB(user: User): Boolean = {
+    try {
+      DatabaseQuery addUser(user.name, user.username, user.mail, user.password)
+    }
+    catch {
+      case e: ExceptionInInitializerError => {
+        println("Database not initialized ! Open DB connection")
+        false
+      }
+    }
+  }
 
-  //todo
-  private def addResult(user: User, result: MatchResult): Boolean = true
+  private def checkLoginInfo(username: String, password: String): Boolean = {
+    try {
+      val result: String = DatabaseQuery checkLogin(username, password)
+
+      result match {
+        case "logged" => true
+        case "passwordWrong" => false
+        case "unregisteredUsername" => false
+      }
+    }
+    catch {
+      case e: ExceptionInInitializerError => {
+        println("Database not initialized ! Open DB connection")
+        false
+      }
+    }
+  }
+
+  private def addResult(username: String, result: MatchResult): Boolean = {
+    try {
+      DatabaseQuery addMatchResult(username, result)
+    }
+    catch {
+      case e: ExceptionInInitializerError => {
+        println("Database not initialized ! Open DB connection")
+        false
+      }
+    }
+  }
 
 }

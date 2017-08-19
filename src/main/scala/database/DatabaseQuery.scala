@@ -120,7 +120,6 @@ object DatabaseQuery {
     try {
       val query = "INSERT INTO gamematch " + "VALUES (?,?,?,?,?)"
       val statement = connection.prepareStatement(query)
-      println("prepar")
       statement.setNull(1, 1)
       statement.setBoolean(2, matchResult.result)
       statement.setDate(3,new java.sql.Date(matchResult.date.getTimeInMillis()) )

@@ -4,7 +4,6 @@ package clientModel.model.utilities
   *
   * @tparam T the measure unit used on x axis.
   * @tparam W the measure unit used on y axis.
-  *
   * @author manuBottax
   */
 trait Point [T,W] {
