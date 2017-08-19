@@ -150,7 +150,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
         sendNotificationMessage(x,reply)
       })
 
-      if(selectedMatch.involvedPlayerIP.size >= 3){
+      if(selectedMatch.involvedPlayerIP.size == 3){
 
         println("Minimum player reached ! waiting for other player ..")
         TimerImpl(this).waitingFor(10000 , selectedMatch)
@@ -487,7 +487,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
     println("Timeout occurred ! match will start !")
 
-    val reply: JSONObject = JSONObject(Map[String, Any](
+    val reply: JSONObject = JSONObject(Map[String, String](
       "object" -> "notifyStart" ))
 
     currentMatch.involvedPlayerIP.foreach(x => sendNotificationMessage(x, reply))
