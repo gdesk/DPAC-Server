@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.{ActorSelection, UntypedAbstractActor}
 import model._
-import utils.ActorsUtils
+import utils.{ActorsUtils, TimerImpl}
 
 import scala.util.parsing.json.JSONObject
 
@@ -151,6 +151,8 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       })
 
       if(selectedMatch.involvedPlayerIP.size >= 3){
+
+        println("Minimum player reached ! waiting for other player ..")
         TimerImpl(this).waitingFor(10000 , selectedMatch)
       }
     }
@@ -483,10 +485,12 @@ class MessageDispatcherActor extends UntypedAbstractActor {
 
   def synchroStartMatch(currentMatch: Match) : Unit ={
 
+    println("Timeout occurred ! match will start !")
+
     val reply: JSONObject = JSONObject(Map[String, Any](
       "object" -> "notifyStart" ))
 
-    currentMatch.involvedPlayerIP.foreach(x => sendConfigurationMessage(x, reply))
+    currentMatch.involvedPlayerIP.foreach(x => sendNotificationMessage(x, reply))
 
   }
 
