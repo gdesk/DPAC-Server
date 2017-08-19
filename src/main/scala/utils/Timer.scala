@@ -6,7 +6,7 @@ import model.Match
 /**
   * Created by lucch on 16/08/2017.
   */
-case class TimerImpl(actor: MessageDispatcherActor) {
+case class Timer(actor: MessageDispatcherActor) {
 
   def waitingFor(milliseconds: Long, currentMatch: Match): Unit ={
 

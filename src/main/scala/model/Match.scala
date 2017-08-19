@@ -9,7 +9,8 @@ package model
 class Match (var involvedPlayerIP: List[String], val size: Range){
 
   val id: Int = scala.util.Random.nextInt(100)
-  var readyPlayer: Int = 0
+  var
+  readyPlayer: Int = 0
 
   def addPlayer (playerIP: String): Boolean = {
     var addedToMatch: Boolean = false

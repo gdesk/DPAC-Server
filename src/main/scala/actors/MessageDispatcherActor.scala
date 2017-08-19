@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.{ActorSelection, UntypedAbstractActor}
 import model._
-import utils.{ActorsUtils, TimerImpl}
+import utils.{ActorsUtils, Timer}
 
 import scala.util.parsing.json.JSONObject
 
@@ -153,7 +153,7 @@ class MessageDispatcherActor extends UntypedAbstractActor {
       if(selectedMatch.involvedPlayerIP.size == 3){
 
         println("Minimum player reached ! waiting for other player ..")
-        TimerImpl(this).waitingFor(10000 , selectedMatch)
+        Timer(this).waitingFor(10000 , selectedMatch)
       }
     }
 
