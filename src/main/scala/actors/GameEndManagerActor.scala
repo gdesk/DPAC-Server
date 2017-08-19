@@ -16,7 +16,6 @@ class GameEndManagerActor extends UntypedAbstractActor {
 
   override def onReceive(message: Any): Unit = ActorsUtils.messageType(message) match {
 
-    //todo: da testare !
     case "saveMatch" => {
 
       val score: Int = message.asInstanceOf[JSONObject].obj("score").asInstanceOf[Int]

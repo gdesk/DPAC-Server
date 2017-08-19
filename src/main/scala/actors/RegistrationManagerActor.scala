@@ -20,7 +20,6 @@ class RegistrationManagerActor extends UntypedAbstractActor {
 
       println("A new user want to register !")
 
-      //todo: andrebbe controllato che queste stringhe non siano vuote.
       val name: String = message.asInstanceOf[JSONObject].obj("name").toString
       val username: String = message.asInstanceOf[JSONObject].obj("username").toString
       val email: String = message.asInstanceOf[JSONObject].obj("email").toString

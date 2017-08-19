@@ -31,7 +31,6 @@ class GameConfigurationManagerActor extends UntypedAbstractActor {
 
     }
 
-      //todo: da testare: controllare se funziona la creazione di una nuova quando non lo trova
     case "selectedRange" => {
 
       val ip: String = message.asInstanceOf[JSONObject].obj("senderIP").toString

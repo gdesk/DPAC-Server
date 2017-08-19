@@ -405,7 +405,6 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     receiver ! message
   }
 
-  //todo: da testare
   /** Send a notification message to a remote host.
     *
     * @param ipAddress: the host IP address
@@ -422,7 +421,6 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     receiver ! message
   }
 
-  //todo: da testare
   /** Send a message to all remote host of the match of the client with the specified IP.
     *
     * @param ip: the host IP address
@@ -437,7 +435,6 @@ class MessageDispatcherActor extends UntypedAbstractActor {
     }
   }
 
-  //todo: da testare
   /** Send a configuration message to all remote host of the match of the client with the specified IP.
     *
     * @param ip: the host IP address
@@ -453,7 +450,6 @@ class MessageDispatcherActor extends UntypedAbstractActor {
   }
 
 
-  //todo: da testare
   /** Send a notification message to all remote host of the match of the client with the specified IP except him.
     *
     * @param excludedClient: the excluded host IP address

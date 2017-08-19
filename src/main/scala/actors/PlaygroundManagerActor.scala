@@ -20,8 +20,6 @@ import scala.util.parsing.json.JSONObject
   */
 class PlaygroundManagerActor extends UntypedAbstractActor {
 
-  //todo: questa classe non gestisce più partite in concorrenza
-
   val availablePlayground: List[File] = getAvailablePlayground
 
   var currentVoteCount: Int = 0
@@ -55,7 +53,6 @@ class PlaygroundManagerActor extends UntypedAbstractActor {
                  "senderIP" -> senderIP))
     }
 
-      // todo: da testare
       // handle the votation for a playground from a client
     case "chosenPlayground" => {
       val vote: Int = message.asInstanceOf[JSONObject].obj("playground").asInstanceOf[Int]

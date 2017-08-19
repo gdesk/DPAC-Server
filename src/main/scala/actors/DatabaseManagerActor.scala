@@ -98,7 +98,6 @@ class DatabaseManagerActor extends UntypedAbstractActor {
     case _ => println(getSelf() + "received unknown message: " + ActorsUtils.messageType(message))
   }
 
-  //todo: da testare
   private def getMatchResultFor(username: String): Option[List[Map[String, Any]]] = {
     try {
       val results: List[MatchResult] = DatabaseQuery.allMatches(username)
@@ -119,7 +118,6 @@ class DatabaseManagerActor extends UntypedAbstractActor {
     }
   }
 
-  // todo: da testare
   private def addUserToDB(user: User): Boolean = {
     try {
       DatabaseQuery addUser(user.name, user.username, user.mail, user.password)
@@ -132,7 +130,6 @@ class DatabaseManagerActor extends UntypedAbstractActor {
     }
   }
 
-  //Todo: da testare
   private def checkLoginInfo(username: String, password: String): Boolean = {
     try {
       val result: String = DatabaseQuery checkLogin(username, password)
@@ -151,7 +148,6 @@ class DatabaseManagerActor extends UntypedAbstractActor {
     }
   }
 
-  //todo: da testare
   private def addResult(username: String, result: MatchResult): Boolean = {
     try {
       DatabaseQuery addMatchResult(username, result)
