@@ -19,7 +19,7 @@ object Utils {
   val IMAGES_BASE_PATH = "/characters/"
   val IMAGES_EXTENSION = ".png"
 
-  def getResource(path: String): URL = Utils.getClass.getResource(path)   //TODO lanciare eccezione nel caso in cui non trovi la risorsa!
+ def getResource(path: String): URL = Utils.getClass.getResource(path)   //TODO lanciare eccezione nel caso in cui non trovi la risorsa!
 
   def getCharacterImage(path: String): Image = {
     val completePath: String = IMAGES_BASE_PATH + path + IMAGES_EXTENSION

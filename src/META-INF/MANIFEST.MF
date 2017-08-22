@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Class-Path: reactive-streams-1.0.0.jar scalactic_2.12-3.0.1.jar akka-s
+ tream_2.12-2.5.3.jar akka-protobuf_2.12-2.5.3.jar akka-actor_2.12-2.5
+ .3.jar agrona-0.9.5.jar ssl-config-core_2.12-0.2.1.jar netty-3.10.6.F
+ inal.jar scala-library-2.12.2.jar aeron-driver-1.2.5.jar scala-xml_2.
+ 12-1.0.5.jar aeron-client-1.2.5.jar scala-parser-combinators_2.12-1.0
+ .4.jar scalatest_2.12-3.0.1.jar mysql-connector-java-5.1.43.jar scala
+ -reflect-2.12.0.jar config-1.3.1.jar scala-java8-compat_2.12-0.8.0.ja
+ r akka-remote_2.12-2.5.3.jar
+Main-Class: Main
+
