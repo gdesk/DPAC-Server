@@ -4,7 +4,6 @@ import java.net.InetAddress
 import actors.{MessageDispatcherActor, MessageReceiverActor}
 import akka.actor.{ActorRef, ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
-import utils.ActorsUtils
 
 /** The main class for the server application.
   * It configure the server and start actors system.
@@ -25,7 +24,7 @@ object Main {
     println("-- Server configuration and startup --")
     println()
 
-    val myIP = ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
+    val myIP =InetAddress.getLocalHost.getHostAddress //ActorsUtils.parseIP(InetAddress.getLocalHost.toString)
     //val myIP = ActorsUtils.parseIP(NetworkInterface.getByName("wlan1").getInetAddresses.nextElement().toString)
     println("-- my IP: " + myIP + " --")
 
