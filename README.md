@@ -5,7 +5,7 @@ Server Part for the pacman distributed game ( see https://github.com/manuBottax/
 
 ## Report and Documentation
 
-- [SCRUM backlog](D-PAC Backlog/Product Backlog.xlsx)
+- [SCRUM backlog](DPAC_Backlog/Product_Backlog.xlsx)
 - [A complete project report in Italian language](report.pdf)
 
 ## Author
