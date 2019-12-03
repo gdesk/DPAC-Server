@@ -3,4 +3,15 @@ Project for the courses of Software System Development @ Unibo - Ingegneria e Sc
 
 Server Part for the pacman distributed game ( see https://github.com/manuBottax/DPAC-Distributed-Pacman )
 
-Project by Manuel Bottazzi, Giulia Lucchi, Federica Pecci, Margherita Pecorelli & Chiara Varini.
+## Report and Documentation
+
+- [SCRUM backlog](D-PAC Backlog/Product Backlog.xlsx)
+- [A complete project report in Italian language](report.pdf)
+
+## Author
+Manuel Bottazzi (manuel.bottazzi@studio.unibo.it)
+Giulia Lucchi (giulia.lucchi7@studio.unibo.it)
+Margherita Pecorelli (margherita.pecorelli@studio.unibo.it)
+Federica Pezzi (federica.pecci2@studio.unibo.it)
+Chiara Varini (chiara.varini@studio.unibo.it)
+
