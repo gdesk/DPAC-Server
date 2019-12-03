@@ -9,9 +9,9 @@ Server Part for the pacman distributed game ( see https://github.com/manuBottax/
 - [A complete project report in Italian language](report.pdf)
 
 ## Author
-Manuel Bottazzi (manuel.bottazzi@studio.unibo.it)
-Giulia Lucchi (giulia.lucchi7@studio.unibo.it)
-Margherita Pecorelli (margherita.pecorelli@studio.unibo.it)
-Federica Pezzi (federica.pecci2@studio.unibo.it)
-Chiara Varini (chiara.varini@studio.unibo.it)
+- Manuel Bottazzi (manuel.bottazzi@studio.unibo.it)
+- Giulia Lucchi (giulia.lucchi7@studio.unibo.it)
+- Margherita Pecorelli (margherita.pecorelli@studio.unibo.it)
+- Federica Pezzi (federica.pecci2@studio.unibo.it)
+- Chiara Varini (chiara.varini@studio.unibo.it)
 
